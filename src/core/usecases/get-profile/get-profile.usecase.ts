@@ -2,7 +2,9 @@ import { type UnitOfWork } from "../../ports/unit-of-work.port";
 import { type UseCase } from "../base/base.usecase";
 import { type GetProfileOutput } from "./get-profile.output";
 
-export class GetProfileUseCase implements UseCase<void, GetProfileOutput> {
+export type GetProfileUseCasePort = UseCase<void, GetProfileOutput>;
+
+export class GetProfileUseCase implements GetProfileUseCasePort {
   constructor(private readonly uow: UnitOfWork) {}
 
   async execute(): Promise<GetProfileOutput> {

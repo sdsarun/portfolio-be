@@ -1,5 +1,3 @@
-// import { type Cache } from "../../ports/cache.port";
-
 import { type PasswordHasher } from "../../ports/password-hasher.port";
 import { type TokenCryptor } from "../../ports/token-cryptor.port";
 import { type UnitOfWork } from "../../ports/unit-of-work.port";
@@ -8,10 +6,11 @@ import { type SignInInput } from "./signin.input";
 import { type SignInOutput } from "./signin.output";
 import { InvalidCredentialsError, MissingAuthDataError } from "../../errors/auth.error";
 
-export class SignInUseCase implements UseCase<SignInInput, SignInOutput> {
+export type SignInUseCasePort = UseCase<SignInInput, SignInOutput>;
+
+export class SignInUseCase implements SignInUseCasePort {
   constructor(
     private readonly uow: UnitOfWork,
-    // private readonly cache: Cache,
     private readonly passwordHasher: PasswordHasher,
     private readonly tokenCryptor: TokenCryptor
   ) {}

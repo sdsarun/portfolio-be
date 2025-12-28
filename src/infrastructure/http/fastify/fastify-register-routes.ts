@@ -51,7 +51,7 @@ export function fastifyRegisterRoutes(
           });
         }
       });
-      logger.info(`Mapped ${resolvedUrl}`);
+      logger.info(`Mapped ${route.method} ${resolvedUrl}`);
     }
   }
 }

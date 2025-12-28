@@ -1,16 +1,12 @@
-import { PasswordHasher } from "../../../../../../core/ports/password-hasher.port";
-import { InvalidOldPasswordError, MissingAuthDataError } from "../../../../../../core/errors/auth.error";
 import { ValidationError } from "../../../../../../core/errors/validation.error";
-import { type UnitOfWork } from "../../../../../../core/ports/unit-of-work.port";
-import { env } from "../../../../../../infrastructure/env/env.config";
 import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
-import { UpdatePasswordDTO, updatePasswordInputDTOSchema } from "./update-password.dto";
+import { type UpdatePasswordDTO, updatePasswordInputDTOSchema } from "./update-password.dto";
+import { type UpdatePasswordUseCasePort } from "../../../../../../core/usecases/update-password/update-password.usecase";
 
-export class UpdatePasswordHandler implements HttpHandler<{ body: UpdatePasswordDTO }> {
-  constructor(
-    private readonly uow: UnitOfWork,
-    private readonly passwordHasher: PasswordHasher
-  ) {}
+export type UpdatePasswordHandlerPort = HttpHandler<{ body: UpdatePasswordDTO }>;
+
+export class UpdatePasswordHandler implements UpdatePasswordHandlerPort {
+  constructor(private readonly updatePasswordUseCase: UpdatePasswordUseCasePort) {}
 
   async handle({ request }: HttpContext<{ body: UpdatePasswordDTO }>): Promise<HttpResponse> {
     const parsed = await updatePasswordInputDTOSchema.safeParseAsync(request.body);
@@ -18,21 +14,7 @@ export class UpdatePasswordHandler implements HttpHandler<{ body: UpdatePassword
       throw new ValidationError({ issues: parsed.error.issues });
     }
 
-    const { oldPassword, newPassword } = parsed.data;
-
-    const auth = await this.uow.auth.findById(env.AUTH_ID);
-
-    if (!auth?.fields.id || !auth.fields.hashPassword) {
-      throw new MissingAuthDataError();
-    }
-
-    const isOldPasswordMatched = await this.passwordHasher.verify(oldPassword, auth.fields.hashPassword);
-    if (!isOldPasswordMatched) {
-      throw new InvalidOldPasswordError();
-    }
-
-    const newPasswordHash = await this.passwordHasher.hash(newPassword);
-    await this.uow.auth.updateById(auth.fields.id, { hashPassword: newPasswordHash });
-    return { success: true, statusCode: 200, data: { message: "Password updated" } };
+    const result = await this.updatePasswordUseCase.execute(parsed.data);
+    return { success: true, statusCode: 200, data: result };
   }
 }
