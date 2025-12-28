@@ -8,9 +8,11 @@ import { type UpdatePasswordHandlerPort } from "./handlers/update-password/updat
 
 export class AuthRoutes implements HttpRouteDefinition {
   constructor(
-    private readonly requiredTokenMiddleware: HttpMiddleware,
-    private readonly signInHandler: SignInHandlerPort,
-    private readonly updatePasswordHandler: UpdatePasswordHandlerPort
+    private readonly deps: {
+      requiredTokenMiddleware: HttpMiddleware;
+      signInHandler: SignInHandlerPort;
+      updatePasswordHandler: UpdatePasswordHandlerPort;
+    }
   ) {}
 
   routes(): HttpRoute[] {
@@ -19,14 +21,14 @@ export class AuthRoutes implements HttpRouteDefinition {
         method: "POST",
         path: "/auth/signin",
         version: 1,
-        handler: this.signInHandler
+        handler: this.deps.signInHandler
       },
       {
         method: "POST",
         path: "/auth/update-password",
         version: 1,
-        middlewares: [this.requiredTokenMiddleware],
-        handler: this.updatePasswordHandler
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.updatePasswordHandler
       }
     ];
   }

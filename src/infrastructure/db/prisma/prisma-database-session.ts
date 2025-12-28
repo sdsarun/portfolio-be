@@ -1,20 +1,17 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { env } from "../../env/env.config";
 import { Prisma, PrismaClient } from "../../../../generated/prisma/client";
 import {
-  DatabaseSession,
-  RawQueryMode,
-  RawQueryResult
+  type DatabaseSession,
+  type RawQueryMode,
+  type RawQueryResult
 } from "../../../core/ports/database-session.port";
-
-const connectionString = env.DATABASE_URL;
 
 export type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient;
 
 export class PrismaDatabaseSession implements DatabaseSession<PrismaClientOrTransaction> {
   private readonly client: PrismaClient;
 
-  constructor() {
+  constructor(connectionString: string) {
     const adapter = new PrismaPg({ connectionString });
     this.client = new PrismaClient({ adapter });
   }

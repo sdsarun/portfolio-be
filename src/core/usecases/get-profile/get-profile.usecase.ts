@@ -5,18 +5,18 @@ import { type GetProfileOutput } from "./get-profile.output";
 export type GetProfileUseCasePort = UseCase<void, GetProfileOutput>;
 
 export class GetProfileUseCase implements GetProfileUseCasePort {
-  constructor(private readonly uow: UnitOfWork) {}
+  constructor(private readonly deps: { uow: UnitOfWork }) {}
 
   async execute(): Promise<GetProfileOutput> {
     const [profiles, workExperiences, projects, skills, education, certification, contact] =
       await Promise.all([
-        this.uow.profile.findAll(),
-        this.uow.workExperience.findAll(),
-        this.uow.projectExperience.findAll(),
-        this.uow.skill.findAll(),
-        this.uow.education.findAll(),
-        this.uow.certification.findAll(),
-        this.uow.contact.findAll()
+        this.deps.uow.profile.findAll(),
+        this.deps.uow.workExperience.findAll(),
+        this.deps.uow.projectExperience.findAll(),
+        this.deps.uow.skill.findAll(),
+        this.deps.uow.education.findAll(),
+        this.deps.uow.certification.findAll(),
+        this.deps.uow.contact.findAll()
       ]);
 
     return {

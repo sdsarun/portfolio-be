@@ -30,7 +30,8 @@ export class PrismaUnitOfWork implements UnitOfWork {
   public readonly projectLink: ProjectLinkRepository;
   public readonly contact: ContactRepository;
 
-  constructor(private readonly prisma: PrismaClientOrTransaction) {
+  constructor(private readonly deps: { prisma: PrismaClientOrTransaction }) {
+    const { prisma } = deps;
     this.auth = new PrismaAuthRepository(prisma);
     this.profile = new PrismaProfileRepository(prisma);
     this.workExperience = new PrismaWorkExperienceRepository(prisma);
@@ -43,11 +44,11 @@ export class PrismaUnitOfWork implements UnitOfWork {
   }
 
   async runInTransaction<T>(handler: (uow: TransactionalUnitOfWork) => Promise<T>): Promise<T> {
-    if (!("$transaction" in this.prisma)) {
+    if (!("$transaction" in this.deps.prisma)) {
       return handler(this);
     }
-    return this.prisma.$transaction(async (transaction) => {
-      const transactionalUow = new PrismaUnitOfWork(transaction);
+    return this.deps.prisma.$transaction(async (transaction) => {
+      const transactionalUow = new PrismaUnitOfWork({ prisma: transaction });
       return handler(transactionalUow);
     });
   }

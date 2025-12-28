@@ -4,7 +4,7 @@ import { logger } from "../../src/infrastructure/logger/logger";
 import { Argon2PasswordHasher } from "../../src/infrastructure/security/argon2.password-hasher";
 
 export async function seedAuth(db: PrismaClientOrTransaction) {
-  const passwordHasher = new Argon2PasswordHasher();
+  const passwordHasher = new Argon2PasswordHasher({ pepper: env.PASSWORD_PEPPER });
   const hashPassword = await passwordHasher.hash(env.PASSWORD_AUTH);
 
   const exists = await db.auth.findFirst({
