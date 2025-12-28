@@ -27,6 +27,8 @@ import { UpsertProfileInfoHandler } from "../../adapters/http/routes/profile/han
 import { UpsertProfileResumeHandler } from "../../adapters/http/routes/profile/handlers/upsert-resume/upsert-profile-resume.handler";
 import { UpsertProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/upsert-work/upsert-profile-work.handler";
 import { UpsertProfileContactHandler } from "../../adapters/http/routes/profile/handlers/upsert-contact/upsert-profile-contact.handler";
+import { GetProfileLatestUpdatedUseCase } from "../../core/usecases/profile-stats/get-profile-latest-updated.usecase";
+import { GetProfileLatestStatsHandler } from "../../adapters/http/routes/profile/handlers/get-latest-stats/get-profile-latest-stats.handler";
 
 export type ApplicationContext = {
   external: {
@@ -92,13 +94,18 @@ export function createApplicationContext(): ApplicationContext {
   const upsertProfileContactHandler = new UpsertProfileContactHandler({
     upsertProfileContactUseCase
   });
+  const getProfileLatestUpdatedUseCase = new GetProfileLatestUpdatedUseCase({ uow });
+  const getProfileLatestStatsHandler = new GetProfileLatestStatsHandler({
+    getProfileLatestUpdatedUseCase
+  });
   const profileRoutes = new ProfileRoutes({
     requiredTokenMiddleware,
     getProfileHandler,
     upsertProfileInfoHandler,
     upsertProfileResumeHandler,
     upsertProfileWorkHandler,
-    upsertProfileContactHandler
+    upsertProfileContactHandler,
+    getProfileLatestStatsHandler
   });
 
   // /system
