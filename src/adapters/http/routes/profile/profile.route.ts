@@ -4,6 +4,7 @@ import { type UpsertProfileInfoHandlerPort } from "./handlers/upsert-info/upsert
 import { type UpsertProfileResumeHandlerPort } from "./handlers/upsert-resume/upsert-profile-resume.handler";
 import { type UpsertProfileWorkHandlerPort } from "./handlers/upsert-work/upsert-profile-work.handler";
 import { type UpsertProfileContactHandlerPort } from "./handlers/upsert-contact/upsert-profile-contact.handler";
+import { type GetProfileLatestStatsHandlerPort } from "./handlers/get-latest-stats/get-profile-latest-stats.handler";
 
 export class ProfileRoutes implements HttpRouteDefinition {
   constructor(
@@ -14,6 +15,7 @@ export class ProfileRoutes implements HttpRouteDefinition {
       upsertProfileResumeHandler: UpsertProfileResumeHandlerPort;
       upsertProfileWorkHandler: UpsertProfileWorkHandlerPort;
       upsertProfileContactHandler: UpsertProfileContactHandlerPort;
+      getProfileLatestStatsHandler: GetProfileLatestStatsHandlerPort;
     }
   ) {}
 
@@ -25,6 +27,13 @@ export class ProfileRoutes implements HttpRouteDefinition {
         version: 1,
         middlewares: [this.deps.requiredTokenMiddleware],
         handler: this.deps.getProfileHandler
+      },
+      {
+        method: "GET",
+        path: "/profile/latest-updated",
+        version: 1,
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.getProfileLatestStatsHandler
       },
       {
         method: "PUT",
