@@ -15,7 +15,6 @@ function loadEnvFile(): void {
   console.error(
     "[env] No environment file found. Application will not start without .env configuration."
   );
-  process.exit(1);
 }
 
 loadEnvFile();
