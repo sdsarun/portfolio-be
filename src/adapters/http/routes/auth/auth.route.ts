@@ -1,15 +1,16 @@
 import {
-  HttpHandler,
   type HttpMiddleware,
   type HttpRoute,
   type HttpRouteDefinition
 } from "../../http-adapter.port";
+import { type SignInHandlerPort } from "./handlers/signin/signin.handler";
+import { type UpdatePasswordHandlerPort } from "./handlers/update-password/update-password.handler";
 
 export class AuthRoutes implements HttpRouteDefinition {
   constructor(
     private readonly requiredTokenMiddleware: HttpMiddleware,
-    private readonly signInHandler: HttpHandler,
-    private readonly updatePasswordHandler: HttpHandler
+    private readonly signInHandler: SignInHandlerPort,
+    private readonly updatePasswordHandler: UpdatePasswordHandlerPort
   ) {}
 
   routes(): HttpRoute[] {

@@ -15,6 +15,10 @@ import { InMemoryCache } from "../cache/in-memory.cache";
 import { PrismaDatabaseHealthCheck } from "../health/prisma-database.health";
 import { FetchHttpPingHealthCheck } from "../health/http.health";
 import { UpdatePasswordHandler } from "../../adapters/http/routes/auth/handlers/update-password/update-password.handler";
+import { UpdatePasswordUseCase } from "../../core/usecases/update-password/update-password.usecase";
+import { GetProfileUseCase } from "../../core/usecases/get-profile/get-profile.usecase";
+import { GetProfileHandler } from "../../adapters/http/routes/profile/handlers/get-profile.handler";
+import { ProfileRoutes } from "../../adapters/http/routes/profile/profile.route";
 
 export type ApplicationContext = {
   external: {
@@ -47,8 +51,14 @@ export function createApplicationContext(): ApplicationContext {
   // /auth
   const signInUseCase = new SignInUseCase(uow, passwordHasher, tokenCryptor);
   const signInHandler = new SignInHandler(signInUseCase);
-  const updatePasswordHandler = new UpdatePasswordHandler(uow, passwordHasher);
+  const updatePasswordUseCase = new UpdatePasswordUseCase(uow, passwordHasher, env.AUTH_ID);
+  const updatePasswordHandler = new UpdatePasswordHandler(updatePasswordUseCase);
   const authRoutes = new AuthRoutes(requiredTokenMiddleware, signInHandler, updatePasswordHandler);
+
+  // /profile
+  const getProfileUseCase = new GetProfileUseCase(uow);
+  const getProfileHandler = new GetProfileHandler(getProfileUseCase);
+  const profileRoutes = new ProfileRoutes(requiredTokenMiddleware, getProfileHandler);
 
   // /system
   const healthHandler = new HealthHandler(prismaDatabaseHealthCheck, fetchHttpPingHealthCheck);
@@ -59,7 +69,7 @@ export function createApplicationContext(): ApplicationContext {
       db: prisma,
       cache
     },
-    routes: [systemRoutes, authRoutes],
+    routes: [systemRoutes, authRoutes, profileRoutes],
     middlewares: {
       requiredTokenMiddleware
     }

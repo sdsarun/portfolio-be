@@ -1,10 +1,12 @@
-import type { HttpContext, HttpHandler, HttpResponse } from "../../../../http-adapter.port";
-import { SignInUseCase } from "../../../../../../core/usecases/signin/signin.usecase";
+import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
+import { type SignInUseCasePort } from "../../../../../../core/usecases/signin/signin.usecase";
 import { signInInputDTOSchema } from "./signin.dto";
 import { ValidationError } from "../../../../../../core/errors/validation.error";
 
+export type SignInHandlerPort = HttpHandler;
+
 export class SignInHandler implements HttpHandler {
-  constructor(private readonly signInUseCase: SignInUseCase) {}
+  constructor(private readonly signInUseCase: SignInUseCasePort) {}
 
   async handle({ request }: HttpContext): Promise<HttpResponse> {
     const parsed = await signInInputDTOSchema.safeParseAsync(request.body);
