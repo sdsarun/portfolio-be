@@ -7,6 +7,7 @@
     "dev": "npm run clean:dist && npm run db:generate && concurrently -k --raw \"npm run build:watch\" \"wait-on --log file:dist/src/main.js && npm run start:watch\"",
     "clean:dist": "rimraf dist",
     "build": "npm run clean:dist && tsc --project tsconfig.json",
+    "build:clean": "npm run clean:dist && tsc --project tsconfig.json",
     "build:watch": "npm run build -- --watch",
     "prisma": "prisma",
     "db:migrate": "npm run prisma -- migrate",
