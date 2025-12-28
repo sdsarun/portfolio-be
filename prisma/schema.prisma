@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Auth {
+  id           String   @id @default(uuid()) @db.Uuid
+  hashPassword String?  @map("hash_password") @db.Text
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  profile      Profile?
+
+  @@map("auth")
+}
+
+model Profile {
+  id                 String              @id @default(uuid()) @db.Uuid
+  authId             String?             @map("auth_id") @db.Uuid
+  displayName        String?             @map("display_name") @db.Text
+  roleName           String?             @map("role_name") @db.Text
+  bioTitle           String?             @map("bio_title") @db.Text
+  bioDescription     String?             @map("bio_description") @db.Text
+  updatedAt          DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  resumeUrl          String?             @map("resume_url") @db.Text
+  siteUrl            String?             @map("site_url") @db.Text
+  auth               Auth?               @relation(fields: [authId], references: [id])
+  workExperiences    WorkExperience[]
+  skills             Skill[]
+  education          Education[]
+  certifications     Certification[]
+  projectExperiences ProjectExperience[]
+  contacts           Contact[]
+
+  @@unique([authId])
+  @@index([authId])
+  @@map("profile")
+}
+
+model WorkExperience {
+  id           String    @id @default(uuid()) @db.Uuid
+  profileId    String?   @map("profile_id") @db.Uuid
+  jobTitle     String?   @map("job_title") @db.Text
+  companyName  String?   @map("company_name") @db.Text
+  startDate    DateTime? @map("start_date") @db.Date
+  endDate      DateTime? @map("end_date") @db.Date
+  isCurrent    Boolean?  @map("is_current") @db.Boolean
+  description  String?   @db.Text
+  displayOrder Int?      @map("display_order") @db.Integer
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?  @relation(fields: [profileId], references: [id])
+
+  @@index([profileId])
+  @@map("work_experience")
+}
+
+model Skill {
+  id           String    @id @default(uuid()) @db.Uuid
+  profileId    String?   @map("profile_id") @db.Uuid
+  categoryName String?   @map("category_name") @db.Text
+  skillNames   String?   @map("skill_names") @db.Text
+  displayOrder Int?      @map("display_order") @db.Integer
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?  @relation(fields: [profileId], references: [id])
+
+  @@index([profileId])
+  @@map("skills")
+}
+
+model Education {
+  id          String    @id @default(uuid()) @db.Uuid
+  profileId   String?   @map("profile_id") @db.Uuid
+  major       String?   @db.Text
+  institution String?   @db.Text
+  startDate   DateTime? @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date") @db.Date
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile     Profile?  @relation(fields: [profileId], references: [id])
+
+  @@index([profileId])
+  @@map("education")
+}
+
+model Certification {
+  id           String    @id @default(uuid()) @db.Uuid
+  profileId    String?   @map("profile_id") @db.Uuid
+  name         String?   @db.Text
+  issuer       String?   @db.Text
+  completeDate DateTime? @map("complete_date") @db.Date
+  displayOrder Int?      @map("display_order") @db.Integer
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?  @relation(fields: [profileId], references: [id])
+
+  @@index([profileId])
+  @@map("certifications")
+}
+
+model ProjectExperience {
+  id           String        @id @default(uuid()) @db.Uuid
+  profileId    String?       @map("profile_id") @db.Uuid
+  title        String?       @db.Text
+  isInProgress Boolean?      @map("is_in_progress") @db.Boolean
+  startDate    DateTime?     @map("start_date") @db.Date
+  endDate      DateTime?     @map("end_date") @db.Date
+  imageUrl     String?       @map("image_url") @db.Text
+  description  String?       @db.Text
+  tags         String?       @db.Text
+  displayOrder Int?          @map("display_order") @db.Integer
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?     @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?      @relation(fields: [profileId], references: [id])
+  projectLinks ProjectLink[]
+
+  @@index([profileId])
+  @@map("project_experience")
+}
+
+model ProjectLink {
+  id                String             @id @default(uuid()) @db.Uuid
+  projectId         String?            @map("project_id") @db.Uuid
+  name              String?            @db.Text
+  url               String?            @db.Text
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt         DateTime?          @map("deleted_at") @db.Timestamptz(6)
+  projectExperience ProjectExperience? @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@map("project_links")
+}
+
+model Contact {
+  id           String    @id @default(uuid()) @db.Uuid
+  profileId    String?   @map("profile_id") @db.Uuid
+  type         String?   @db.Text
+  label        String?   @db.Text
+  value        String?   @db.Text
+  displayValue String?   @map("display_value") @db.Text
+  displayOrder Int?      @map("display_order") @db.Integer
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?  @relation(fields: [profileId], references: [id])
+
+  @@index([profileId])
+  @@map("contact")
+}
