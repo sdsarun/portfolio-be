@@ -3,6 +3,7 @@ import { type UseCase } from "../base/base.usecase";
 import { type UpsertProfileContactInput } from "./upsert-profile-contact.input";
 import { type UpsertProfileContactOutput } from "./upsert-profile-contact.output";
 import { type Contact } from "../../entities/contact/contact.entity";
+import { ContactType } from "../../constants/contact-type.constant";
 
 export type UpsertProfileContactUseCasePort = UseCase<
   UpsertProfileContactInput,
@@ -36,14 +37,17 @@ export class UpsertProfileContactUseCase implements UpsertProfileContactUseCaseP
           ? existingForProfile.find((existingItem) => existingItem.fields.id === item.id)
           : undefined;
 
+        const type = item.type !== undefined ? item.type : (current?.fields.type ?? null);
+        const value = item.value !== undefined ? item.value : (current?.fields.value ?? null);
+
         const record = await uow.contact.upsert({
           id: item.id,
           profileId,
-          type: item.type !== undefined ? item.type : current?.fields.type ?? null,
-          value: item.value !== undefined ? item.value : current?.fields.value ?? null,
-          label: item.label !== undefined ? item.label : current?.fields.label ?? null,
+          type,
+          value: this.formatContactValue(type, value),
+          label: item.label !== undefined ? item.label : (current?.fields.label ?? null),
           displayValue:
-            item.displayValue !== undefined ? item.displayValue : current?.fields.displayValue ?? null,
+            item.displayValue !== undefined ? item.displayValue : (current?.fields.displayValue ?? null),
           displayOrder: item.displayOrder ?? current?.fields.displayOrder ?? index + 1
         });
 
@@ -62,5 +66,16 @@ export class UpsertProfileContactUseCase implements UpsertProfileContactUseCaseP
 
       return { contacts: saved.map((item) => item.fields) };
     });
+  }
+
+  private formatContactValue(
+    type: string | null | undefined,
+    value: string | null | undefined
+  ): string | null {
+    if (!value) return value ?? null;
+    if (type === ContactType.EMAIL && !value.startsWith("mailto:")) {
+      return `mailto:${value}`;
+    }
+    return value;
   }
 }

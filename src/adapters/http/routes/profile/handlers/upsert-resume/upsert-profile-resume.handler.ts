@@ -6,7 +6,7 @@ import {
 import { ValidationError } from "../../../../../../core/errors/validation.error";
 import {
   type UpsertProfileResumeUseCasePort
-} from "../../../../../../core/usecases/upsert-profile/upsert-profile-resume.usecase";
+} from "../../../../../../core/usecases/upsert-profile-resume/upsert-profile-resume.usecase";
 import {
   UpsertProfileResumeDTO,
   upsertProfileResumeInputDTOSchema

@@ -19,10 +19,10 @@ import { UpdatePasswordUseCase } from "../../core/usecases/update-password/updat
 import { GetProfileUseCase } from "../../core/usecases/get-profile/get-profile.usecase";
 import { GetProfileHandler } from "../../adapters/http/routes/profile/handlers/get-profile/get-profile.handler";
 import { ProfileRoutes } from "../../adapters/http/routes/profile/profile.route";
-import { UpsertProfileInfoUseCase } from "../../core/usecases/upsert-profile/upsert-profile-info.usecase";
-import { UpsertProfileResumeUseCase } from "../../core/usecases/upsert-profile/upsert-profile-resume.usecase";
-import { UpsertProfileWorkUseCase } from "../../core/usecases/upsert-profile/upsert-profile-work.usecase";
-import { UpsertProfileContactUseCase } from "../../core/usecases/upsert-profile/upsert-profile-contact.usecase";
+import { UpsertProfileInfoUseCase } from "../../core/usecases/upsert-profile-info/upsert-profile-info.usecase";
+import { UpsertProfileResumeUseCase } from "../../core/usecases/upsert-profile-resume/upsert-profile-resume.usecase";
+import { UpsertProfileWorkUseCase } from "../../core/usecases/upsert-profile-work/upsert-profile-work.usecase";
+import { UpsertProfileContactUseCase } from "../../core/usecases/upsert-profile-contact/upsert-profile-contact.usecase";
 import { UpsertProfileInfoHandler } from "../../adapters/http/routes/profile/handlers/upsert-info/upsert-profile-info.handler";
 import { UpsertProfileResumeHandler } from "../../adapters/http/routes/profile/handlers/upsert-resume/upsert-profile-resume.handler";
 import { UpsertProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/upsert-work/upsert-profile-work.handler";
