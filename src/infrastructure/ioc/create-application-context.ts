@@ -29,6 +29,14 @@ import { UpsertProfileWorkHandler } from "../../adapters/http/routes/profile/han
 import { UpsertProfileContactHandler } from "../../adapters/http/routes/profile/handlers/upsert-contact/upsert-profile-contact.handler";
 import { GetProfileLatestUpdatedUseCase } from "../../core/usecases/profile-stats/get-profile-latest-updated.usecase";
 import { GetProfileLatestStatsHandler } from "../../adapters/http/routes/profile/handlers/get-latest-stats/get-profile-latest-stats.handler";
+import { GetProfileInfoUseCase } from "../../core/usecases/get-profile-info/get-profile-info.usecase";
+import { GetProfileResumeUseCase } from "../../core/usecases/get-profile-resume/get-profile-resume.usecase";
+import { GetProfileWorkUseCase } from "../../core/usecases/get-profile-work/get-profile-work.usecase";
+import { GetProfileContactUseCase } from "../../core/usecases/get-profile-contact/get-profile-contact.usecase";
+import { GetProfileInfoHandler } from "../../adapters/http/routes/profile/handlers/get-info/get-profile-info.handler";
+import { GetProfileResumeHandler } from "../../adapters/http/routes/profile/handlers/get-resume/get-profile-resume.handler";
+import { GetProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/get-work/get-profile-work.handler";
+import { GetProfileContactHandler } from "../../adapters/http/routes/profile/handlers/get-contact/get-profile-contact.handler";
 
 export type ApplicationContext = {
   external: {
@@ -77,6 +85,14 @@ export function createApplicationContext(): ApplicationContext {
   // /profile
   const getProfileUseCase = new GetProfileUseCase({ uow });
   const getProfileHandler = new GetProfileHandler({ getProfileUseCase });
+  const getProfileInfoUseCase = new GetProfileInfoUseCase({ uow });
+  const getProfileInfoHandler = new GetProfileInfoHandler({ getProfileInfoUseCase });
+  const getProfileResumeUseCase = new GetProfileResumeUseCase({ uow });
+  const getProfileResumeHandler = new GetProfileResumeHandler({ getProfileResumeUseCase });
+  const getProfileWorkUseCase = new GetProfileWorkUseCase({ uow });
+  const getProfileWorkHandler = new GetProfileWorkHandler({ getProfileWorkUseCase });
+  const getProfileContactUseCase = new GetProfileContactUseCase({ uow });
+  const getProfileContactHandler = new GetProfileContactHandler({ getProfileContactUseCase });
   const upsertProfileInfoUseCase = new UpsertProfileInfoUseCase({ uow, authId: env.AUTH_ID });
   const upsertProfileInfoHandler = new UpsertProfileInfoHandler({ upsertProfileInfoUseCase });
   const upsertProfileResumeUseCase = new UpsertProfileResumeUseCase({
@@ -101,6 +117,10 @@ export function createApplicationContext(): ApplicationContext {
   const profileRoutes = new ProfileRoutes({
     requiredTokenMiddleware,
     getProfileHandler,
+    getProfileInfoHandler,
+    getProfileResumeHandler,
+    getProfileWorkHandler,
+    getProfileContactHandler,
     upsertProfileInfoHandler,
     upsertProfileResumeHandler,
     upsertProfileWorkHandler,

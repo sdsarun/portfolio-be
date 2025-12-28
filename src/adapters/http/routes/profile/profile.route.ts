@@ -5,12 +5,20 @@ import { type UpsertProfileResumeHandlerPort } from "./handlers/upsert-resume/up
 import { type UpsertProfileWorkHandlerPort } from "./handlers/upsert-work/upsert-profile-work.handler";
 import { type UpsertProfileContactHandlerPort } from "./handlers/upsert-contact/upsert-profile-contact.handler";
 import { type GetProfileLatestStatsHandlerPort } from "./handlers/get-latest-stats/get-profile-latest-stats.handler";
+import { type GetProfileInfoHandlerPort } from "./handlers/get-info/get-profile-info.handler";
+import { type GetProfileResumeHandlerPort } from "./handlers/get-resume/get-profile-resume.handler";
+import { type GetProfileWorkHandlerPort } from "./handlers/get-work/get-profile-work.handler";
+import { type GetProfileContactHandlerPort } from "./handlers/get-contact/get-profile-contact.handler";
 
 export class ProfileRoutes implements HttpRouteDefinition {
   constructor(
     private readonly deps: {
       requiredTokenMiddleware: HttpMiddleware;
       getProfileHandler: GetProfileHandlerPort;
+      getProfileInfoHandler: GetProfileInfoHandlerPort;
+      getProfileResumeHandler: GetProfileResumeHandlerPort;
+      getProfileWorkHandler: GetProfileWorkHandlerPort;
+      getProfileContactHandler: GetProfileContactHandlerPort;
       upsertProfileInfoHandler: UpsertProfileInfoHandlerPort;
       upsertProfileResumeHandler: UpsertProfileResumeHandlerPort;
       upsertProfileWorkHandler: UpsertProfileWorkHandlerPort;
@@ -43,11 +51,25 @@ export class ProfileRoutes implements HttpRouteDefinition {
         handler: this.deps.upsertProfileInfoHandler
       },
       {
+        method: "GET",
+        path: "/profile/info",
+        version: 1,
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.getProfileInfoHandler
+      },
+      {
         method: "PUT",
         path: "/profile/resume",
         version: 1,
         middlewares: [this.deps.requiredTokenMiddleware],
         handler: this.deps.upsertProfileResumeHandler
+      },
+      {
+        method: "GET",
+        path: "/profile/resume",
+        version: 1,
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.getProfileResumeHandler
       },
       {
         method: "PUT",
@@ -57,11 +79,25 @@ export class ProfileRoutes implements HttpRouteDefinition {
         handler: this.deps.upsertProfileWorkHandler
       },
       {
+        method: "GET",
+        path: "/profile/work",
+        version: 1,
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.getProfileWorkHandler
+      },
+      {
         method: "PUT",
         path: "/profile/contact",
         version: 1,
         middlewares: [this.deps.requiredTokenMiddleware],
         handler: this.deps.upsertProfileContactHandler
+      },
+      {
+        method: "GET",
+        path: "/profile/contact",
+        version: 1,
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.getProfileContactHandler
       }
     ];
   }
