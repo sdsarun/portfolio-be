@@ -6,7 +6,7 @@ import { ValidationError } from "../../../../../../core/errors/validation.error"
 export type SignInHandlerPort = HttpHandler;
 
 export class SignInHandler implements HttpHandler {
-  constructor(private readonly signInUseCase: SignInUseCasePort) {}
+  constructor(private readonly deps: { signInUseCase: SignInUseCasePort }) {}
 
   async handle({ request }: HttpContext): Promise<HttpResponse> {
     const parsed = await signInInputDTOSchema.safeParseAsync(request.body);
@@ -14,7 +14,7 @@ export class SignInHandler implements HttpHandler {
       throw new ValidationError({ issues: parsed.error.issues });
     }
 
-    const result = await this.signInUseCase.execute(parsed.data);
+    const result = await this.deps.signInUseCase.execute(parsed.data);
     return {
       success: true,
       statusCode: 201,

@@ -2,6 +2,7 @@ import { Entity } from '../base/base.entity';
 
 export type EducationAttributes = {
   id: string | null;
+  profileId: string | null;
   major: string | null;
   institution: string | null;
   startDate: Date | null;
@@ -14,6 +15,7 @@ export class Education extends Entity<EducationAttributes> {
   protected getDefaultAttributes(): EducationAttributes {
     return {
       id: null,
+      profileId: null,
       major: null,
       institution: null,
       startDate: null,

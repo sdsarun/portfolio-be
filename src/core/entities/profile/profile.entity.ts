@@ -1,6 +1,7 @@
 import { Entity } from '../base/base.entity';
 
 export type ProfileAttributes = {
+  authId: string | null;
   id: string | null;
   displayName: string | null;
   roleName: string | null;
@@ -14,6 +15,7 @@ export type ProfileAttributes = {
 export class Profile extends Entity<ProfileAttributes> {
   protected getDefaultAttributes(): ProfileAttributes {
     return {
+      authId: null,
       id: null,
       displayName: null,
       roleName: null,

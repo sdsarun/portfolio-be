@@ -9,19 +9,21 @@ export type UpdatePasswordUseCasePort = UseCase<UpdatePasswordInput, UpdatePassw
 
 export class UpdatePasswordUseCase implements UpdatePasswordUseCasePort {
   constructor(
-    private readonly uow: UnitOfWork,
-    private readonly passwordHasher: PasswordHasher,
-    private readonly authId: string
+    private readonly deps: {
+      uow: UnitOfWork;
+      passwordHasher: PasswordHasher;
+      authId: string;
+    }
   ) {}
 
   async execute(input: UpdatePasswordInput): Promise<UpdatePasswordOutput> {
-    const auth = await this.uow.auth.findById(this.authId);
+    const auth = await this.deps.uow.auth.findById(this.deps.authId);
 
     if (!auth?.fields.id || !auth.fields.hashPassword) {
       throw new MissingAuthDataError();
     }
 
-    const isOldPasswordMatched = await this.passwordHasher.verify(
+    const isOldPasswordMatched = await this.deps.passwordHasher.verify(
       input.oldPassword,
       auth.fields.hashPassword
     );
@@ -29,8 +31,8 @@ export class UpdatePasswordUseCase implements UpdatePasswordUseCasePort {
       throw new InvalidOldPasswordError();
     }
 
-    const newPasswordHash = await this.passwordHasher.hash(input.newPassword);
-    await this.uow.auth.updateById(auth.fields.id, { hashPassword: newPasswordHash });
+    const newPasswordHash = await this.deps.passwordHasher.hash(input.newPassword);
+    await this.deps.uow.auth.updateById(auth.fields.id, { hashPassword: newPasswordHash });
 
     return { message: "Password updated" };
   }

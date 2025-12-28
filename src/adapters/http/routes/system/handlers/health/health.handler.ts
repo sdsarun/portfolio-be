@@ -3,18 +3,22 @@ import {
   type HttpPingHealthCheck,
   type HealthCheck
 } from "../../../../../../core/ports/health-check.port";
-import { env } from "../../../../../../infrastructure/env/env.config";
+
+export type HealthHandlerPort = HttpHandler;
 
 export class HealthHandler implements HttpHandler {
   constructor(
-    private readonly dbCheck: HealthCheck,
-    private readonly pingCheck: HttpPingHealthCheck
+    private readonly deps: {
+      dbCheck: HealthCheck;
+      pingCheck: HttpPingHealthCheck;
+      portfolioSiteUrl: string;
+    }
   ) {}
 
   async handle(): Promise<HttpResponse> {
     const [database, portfolioSite] = await Promise.all([
-      this.dbCheck.health(),
-      this.pingCheck.ping(env.PORTFOLIO_SITE_URL)
+      this.deps.dbCheck.health(),
+      this.deps.pingCheck.ping(this.deps.portfolioSiteUrl)
     ]);
 
     return {

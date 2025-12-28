@@ -10,20 +10,22 @@ export type SignInUseCasePort = UseCase<SignInInput, SignInOutput>;
 
 export class SignInUseCase implements SignInUseCasePort {
   constructor(
-    private readonly uow: UnitOfWork,
-    private readonly passwordHasher: PasswordHasher,
-    private readonly tokenCryptor: TokenCryptor
+    private readonly deps: {
+      uow: UnitOfWork;
+      passwordHasher: PasswordHasher;
+      tokenCryptor: TokenCryptor;
+    }
   ) {}
 
   async execute(input: SignInInput): Promise<SignInOutput> {
-    const hashPasswordRecords = await this.uow.auth.findAll();
+    const hashPasswordRecords = await this.deps.uow.auth.findAll();
     if (hashPasswordRecords.length === 0) {
       throw new MissingAuthDataError();
     }
 
     const [hashPasswordRecord] = hashPasswordRecords;
 
-    const isValid = await this.passwordHasher.verify(
+    const isValid = await this.deps.passwordHasher.verify(
       input.password,
       hashPasswordRecord.fields.hashPassword!
     );
@@ -32,7 +34,7 @@ export class SignInUseCase implements SignInUseCasePort {
       throw new InvalidCredentialsError();
     }
 
-    const signedToken = await this.tokenCryptor.sign({
+    const signedToken = await this.deps.tokenCryptor.sign({
       id: hashPasswordRecord.fields.id
     });
 

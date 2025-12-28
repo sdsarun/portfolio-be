@@ -3,7 +3,7 @@ import { type TokenCryptor } from "../../../core/ports/token-cryptor.port";
 import { UnauthorizedError } from "../../../core/errors/auth.error";
 
 export class RequiredTokenMiddleware implements HttpMiddleware {
-  constructor(private readonly tokenCryptor: TokenCryptor) {}
+  constructor(private readonly deps: { tokenCryptor: TokenCryptor }) {}
 
   async handle(ctx: HttpContext): Promise<void> {
     const request = ctx.request;
@@ -17,7 +17,7 @@ export class RequiredTokenMiddleware implements HttpMiddleware {
       if (!token) {
         throw new UnauthorizedError("Missing bearer token");
       }
-      const payload = await this.tokenCryptor.verify(token);
+      const payload = await this.deps.tokenCryptor.verify(token);
 
       // attach data to http context
       ctx.state = {

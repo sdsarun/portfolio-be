@@ -2,6 +2,7 @@ import { Entity } from '../base/base.entity';
 
 export type WorkExperienceAttributes = {
   id: string | null;
+  profileId: string | null;
   jobTitle: string | null;
   companyName: string | null;
   startDate: Date | null;
@@ -17,6 +18,7 @@ export class WorkExperience extends Entity<WorkExperienceAttributes> {
   protected getDefaultAttributes(): WorkExperienceAttributes {
     return {
       id: null,
+      profileId: null,
       jobTitle: null,
       companyName: null,
       startDate: null,

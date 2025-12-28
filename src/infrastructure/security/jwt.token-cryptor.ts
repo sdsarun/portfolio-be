@@ -5,19 +5,22 @@ import {
 } from "../../core/ports/token-cryptor.port";
 import * as jwt from "jsonwebtoken";
 import { type SignOptions as JwtSignOptions } from "jsonwebtoken";
-import { env } from "../env/env.config";
 
 export type InitJwtTokenCryptorOptions = {
   secret: string;
+  defaultExpiresIn: string;
+  defaultIssuer: string;
 };
 
 export class JwtTokenCryptor implements TokenCryptor {
   private secret: string;
-  private defaultExpiresIn: string = env.TOKEN_EXP;
-  private defaultIssuer: string = env.SERVICE_NAME;
+  private defaultExpiresIn: string;
+  private defaultIssuer: string;
 
-  constructor({ secret }: InitJwtTokenCryptorOptions) {
+  constructor({ secret, defaultExpiresIn, defaultIssuer }: InitJwtTokenCryptorOptions) {
     this.secret = secret;
+    this.defaultExpiresIn = defaultExpiresIn;
+    this.defaultIssuer = defaultIssuer;
   }
 
   sign(payload: any, options?: SignOptions): Promise<string> {

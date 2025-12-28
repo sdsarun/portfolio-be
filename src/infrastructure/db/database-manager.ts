@@ -1,5 +1,6 @@
 import { type DatabaseSession } from "../../core/ports/database-session.port";
 import { PrismaDatabaseSession, type PrismaClientOrTransaction } from "./prisma/prisma-database-session";
+import { env } from "../env/env.config";
 
 export type DatabaseBackends = {
   prisma: DatabaseSession<PrismaClientOrTransaction>;
@@ -50,7 +51,7 @@ export class DatabaseManager {
   private static create<Name extends DatabaseBackendName>(backend: Name): DatabaseBackends[Name] {
     switch (backend) {
       case "prisma":
-        return new PrismaDatabaseSession() as DatabaseBackends[Name];
+        return new PrismaDatabaseSession(env.DATABASE_URL) as DatabaseBackends[Name];
 
       default: {
         throw new Error(`Unsupported database backend: ${String(backend)}`);
