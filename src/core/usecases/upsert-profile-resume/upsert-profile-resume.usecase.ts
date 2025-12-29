@@ -30,34 +30,34 @@ export class UpsertProfileResumeUseCase implements UpsertProfileResumeUseCasePor
     // Touch related entities on resume update for consistency
     const now = new Date();
     const [workExperiences, skills, education, certifications] = await Promise.all([
-      this.deps.uow.workExperience.findAll(),
-      this.deps.uow.skill.findAll(),
-      this.deps.uow.education.findAll(),
-      this.deps.uow.certification.findAll()
+      this.deps.uow.workExperience.findByProfileId(profileId),
+      this.deps.uow.skill.findByProfileId(profileId),
+      this.deps.uow.education.findByProfileId(profileId),
+      this.deps.uow.certification.findByProfileId(profileId)
     ]);
 
     const updates: Promise<unknown>[] = [];
 
     for (const item of workExperiences) {
-      if (item.fields.profileId === profileId && item.fields.id) {
+      if (item.fields.id) {
         updates.push(this.deps.uow.workExperience.updateById(item.fields.id, { updatedAt: now }));
       }
     }
 
     for (const item of skills) {
-      if (item.fields.profileId === profileId && item.fields.id) {
+      if (item.fields.id) {
         updates.push(this.deps.uow.skill.updateById(item.fields.id, { updatedAt: now }));
       }
     }
 
     for (const item of education) {
-      if (item.fields.profileId === profileId && item.fields.id) {
+      if (item.fields.id) {
         updates.push(this.deps.uow.education.updateById(item.fields.id, { updatedAt: now }));
       }
     }
 
     for (const item of certifications) {
-      if (item.fields.profileId === profileId && item.fields.id) {
+      if (item.fields.id) {
         updates.push(this.deps.uow.certification.updateById(item.fields.id, { updatedAt: now }));
       }
     }

@@ -22,8 +22,7 @@ export class UpsertProfileContactUseCase implements UpsertProfileContactUseCaseP
 
       const profileId = profile.fields.id!;
 
-      const existing = await uow.contact.findAll();
-      const existingForProfile = existing.filter((item) => item.fields.profileId === profileId);
+      const existingForProfile = await uow.contact.findByProfileId(profileId);
 
       if (!input.contacts) {
         return { contacts: existingForProfile.map((item) => item.fields) };

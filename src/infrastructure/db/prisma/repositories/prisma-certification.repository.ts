@@ -44,6 +44,14 @@ export class PrismaCertificationRepository implements CertificationRepository {
     });
   }
 
+  async findByProfileId(profileId: string): Promise<Certification[]> {
+    const records = await this.prisma.certification.findMany({
+      where: { profileId, deletedAt: null },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
+    });
+    return records.map(this.toEntity);
+  }
+
   async findAll(): Promise<Certification[]> {
     const records = await this.prisma.certification.findMany({
       where: { deletedAt: null },

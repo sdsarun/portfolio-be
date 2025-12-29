@@ -32,6 +32,14 @@ export class PrismaContactRepository implements ContactRepository {
     await this.prisma.contact.update({ where: { id }, data: { deletedAt: new Date() } });
   }
 
+  async findByProfileId(profileId: string): Promise<Contact[]> {
+    const records = await this.prisma.contact.findMany({
+      where: { profileId, deletedAt: null },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
+    });
+    return records.map(this.toEntity);
+  }
+
   async findAll(): Promise<Contact[]> {
     const records = await this.prisma.contact.findMany({
       where: { deletedAt: null },

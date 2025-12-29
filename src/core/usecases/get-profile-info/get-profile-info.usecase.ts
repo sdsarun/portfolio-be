@@ -5,10 +5,15 @@ import { type GetProfileInfoOutput } from "./get-profile-info.output";
 export type GetProfileInfoUseCasePort = UseCase<void, GetProfileInfoOutput>;
 
 export class GetProfileInfoUseCase implements GetProfileInfoUseCasePort {
-  constructor(private readonly deps: { uow: UnitOfWork }) {}
+  constructor(
+    private readonly deps: {
+      uow: UnitOfWork;
+      authId: string;
+    }
+  ) {}
 
   async execute(): Promise<GetProfileInfoOutput> {
-    const profiles = await this.deps.uow.profile.findAll();
-    return { profile: profiles?.[0]?.fields ?? null };
+    const profile = await this.deps.uow.profile.findByAuthId(this.deps.authId);
+    return { profile: profile?.fields ?? null };
   }
 }

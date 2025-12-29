@@ -18,8 +18,7 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
 
       const profileId = profile.fields.id!;
 
-      const existing = await uow.workExperience.findAll();
-      const existingForProfile = existing.filter((item) => item.fields.profileId === profileId);
+      const existingForProfile = await uow.workExperience.findByProfileId(profileId);
 
       // If no payload provided, return current data.
       if (!input.workExperiences) {

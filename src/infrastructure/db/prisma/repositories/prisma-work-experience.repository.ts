@@ -44,6 +44,14 @@ export class PrismaWorkExperienceRepository implements WorkExperienceRepository 
     });
   }
 
+  async findByProfileId(profileId: string): Promise<WorkExperience[]> {
+    const records = await this.prisma.workExperience.findMany({
+      where: { profileId, deletedAt: null },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
+    });
+    return records.map(this.toEntity);
+  }
+
   async findAll(): Promise<WorkExperience[]> {
     const records = await this.prisma.workExperience.findMany({
       where: { deletedAt: null },

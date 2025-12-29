@@ -5,22 +5,40 @@ import { type GetProfileOutput } from "./get-profile.output";
 export type GetProfileUseCasePort = UseCase<void, GetProfileOutput>;
 
 export class GetProfileUseCase implements GetProfileUseCasePort {
-  constructor(private readonly deps: { uow: UnitOfWork }) {}
+  constructor(
+    private readonly deps: {
+      uow: UnitOfWork;
+      authId: string;
+    }
+  ) {}
 
   async execute(): Promise<GetProfileOutput> {
-    const [profiles, workExperiences, projects, skills, education, certification, contact] =
-      await Promise.all([
-        this.deps.uow.profile.findAll(),
-        this.deps.uow.workExperience.findAll(),
-        this.deps.uow.projectExperience.findAll(),
-        this.deps.uow.skill.findAll(),
-        this.deps.uow.education.findAll(),
-        this.deps.uow.certification.findAll(),
-        this.deps.uow.contact.findAll()
-      ]);
+    const profile = await this.deps.uow.profile.findByAuthId(this.deps.authId);
+    if (!profile?.fields.id) {
+      return {
+        profile: profile?.fields ?? null,
+        workExperiences: [],
+        projectExperiences: [],
+        skills: [],
+        education: [],
+        certification: [],
+        contacts: []
+      };
+    }
+
+    const profileId = profile.fields.id;
+
+    const [workExperiences, projects, skills, education, certification, contact] = await Promise.all([
+      this.deps.uow.workExperience.findByProfileId(profileId),
+      this.deps.uow.projectExperience.findByProfileId(profileId),
+      this.deps.uow.skill.findByProfileId(profileId),
+      this.deps.uow.education.findByProfileId(profileId),
+      this.deps.uow.certification.findByProfileId(profileId),
+      this.deps.uow.contact.findByProfileId(profileId)
+    ]);
 
     return {
-      profile: profiles?.[0]?.fields ?? null,
+      profile: profile.fields,
       workExperiences: workExperiences.map((item) => item.fields),
       projectExperiences: projects.map((item) => item.fields),
       skills: skills.map((item) => item.fields),

@@ -83,15 +83,15 @@ export function createApplicationContext(): ApplicationContext {
   });
 
   // /profile
-  const getProfileUseCase = new GetProfileUseCase({ uow });
+  const getProfileUseCase = new GetProfileUseCase({ uow, authId: env.AUTH_ID });
   const getProfileHandler = new GetProfileHandler({ getProfileUseCase });
-  const getProfileInfoUseCase = new GetProfileInfoUseCase({ uow });
+  const getProfileInfoUseCase = new GetProfileInfoUseCase({ uow, authId: env.AUTH_ID });
   const getProfileInfoHandler = new GetProfileInfoHandler({ getProfileInfoUseCase });
-  const getProfileResumeUseCase = new GetProfileResumeUseCase({ uow });
+  const getProfileResumeUseCase = new GetProfileResumeUseCase({ uow, authId: env.AUTH_ID });
   const getProfileResumeHandler = new GetProfileResumeHandler({ getProfileResumeUseCase });
-  const getProfileWorkUseCase = new GetProfileWorkUseCase({ uow });
+  const getProfileWorkUseCase = new GetProfileWorkUseCase({ uow, authId: env.AUTH_ID });
   const getProfileWorkHandler = new GetProfileWorkHandler({ getProfileWorkUseCase });
-  const getProfileContactUseCase = new GetProfileContactUseCase({ uow });
+  const getProfileContactUseCase = new GetProfileContactUseCase({ uow, authId: env.AUTH_ID });
   const getProfileContactHandler = new GetProfileContactHandler({ getProfileContactUseCase });
   const upsertProfileInfoUseCase = new UpsertProfileInfoUseCase({ uow, authId: env.AUTH_ID });
   const upsertProfileInfoHandler = new UpsertProfileInfoHandler({ upsertProfileInfoUseCase });
@@ -110,7 +110,10 @@ export function createApplicationContext(): ApplicationContext {
   const upsertProfileContactHandler = new UpsertProfileContactHandler({
     upsertProfileContactUseCase
   });
-  const getProfileLatestUpdatedUseCase = new GetProfileLatestUpdatedUseCase({ uow });
+  const getProfileLatestUpdatedUseCase = new GetProfileLatestUpdatedUseCase({
+    uow,
+    authId: env.AUTH_ID
+  });
   const getProfileLatestStatsHandler = new GetProfileLatestStatsHandler({
     getProfileLatestUpdatedUseCase
   });
