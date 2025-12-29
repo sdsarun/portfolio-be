@@ -53,10 +53,6 @@ export class InMemoryCache implements Cache {
     this.memo.delete(key);
   }
 
-  async health(): Promise<"up" | "down"> {
-    return "up";
-  }
-
   private sweepExpired() {
     const now = Date.now();
     for (const [key, entry] of this.memo) {
