@@ -1,18 +1,29 @@
 import { z } from "zod";
 
-export const envSchema = z.object({
-  NODE_ENV: z.enum(["production", "test", "development"]).default("development"),
-  SERVICE_NAME: z.string().default("portfolio-be-by-sdsarun"),
-  PORT: z.coerce.number().int().positive().default(4000),
-  HOST: z.ipv4().default("0.0.0.0"),
-  LOG_LEVEL: z.string().default("info"),
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  AUTH_ID: z.uuidv4().min(1, "AUTH_ID is required"),
-  PASSWORD_AUTH: z.string().min(1, "PASSWORD_AUTH is required"),
-  PASSWORD_PEPPER: z.string().min(1, "PASSWORD_PEPPER is required"),
-  TOKEN_EXP: z.string().default("8h"),
-  PORTFOLIO_SITE_URL: z.url().default("https://sdsarun.dev")
-});
+export const envSchema = z
+  .object({
+    NODE_ENV: z.enum(["production", "test", "development"]).default("development"),
+    SERVICE_NAME: z.string().default("portfolio-be-by-sdsarun"),
+    PORT: z.coerce.number().int().positive().default(4000),
+    HOST: z.ipv4().default("0.0.0.0"),
+    LOG_LEVEL: z.string().default("info"),
+    DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+    AUTH_ID: z.uuidv4().min(1, "AUTH_ID is required"),
+    PASSWORD_AUTH: z.string().min(1, "PASSWORD_AUTH is required"),
+    PASSWORD_PEPPER: z.string().min(1, "PASSWORD_PEPPER is required"),
+    TOKEN_EXP: z.string().default("8h"),
+    PORTFOLIO_SITE_URL: z.url().default("https://sdsarun.dev"),
+    CORS_ALLOWED_ORIGIN: z.string().min(1, "CORS_ALLOWED_ORIGIN is required")
+  })
+  .superRefine((values, ctx) => {
+    if (values.NODE_ENV === "production" && values.CORS_ALLOWED_ORIGIN === "*") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["CORS_ALLOWED_ORIGIN"],
+        message: "CORS_ALLOWED_ORIGIN '*' is not allowed in NODE_ENV production mode"
+      });
+    }
+  });
 
 export type EnvConfig = z.infer<typeof envSchema>;
 

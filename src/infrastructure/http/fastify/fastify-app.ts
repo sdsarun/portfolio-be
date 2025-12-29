@@ -1,13 +1,16 @@
 import fastify from "fastify";
 import fastifyCookie from "@fastify/cookie";
+import fastifyCors from "@fastify/cors";
 import { logger } from "../../logger/logger";
 import { createApplicationContext } from "../../ioc/create-application-context";
 import { fastifyRegisterRoutes } from "./fastify-register-routes";
 import { type HttpAppliaction } from "../http.port";
+import { getCorsConfig } from "../cors.config";
 
 export function createFastifyApp(): HttpAppliaction {
   const server = fastify({ loggerInstance: logger });
   server.register(fastifyCookie);
+  server.register(fastifyCors, getCorsConfig());
 
   const ctx = createApplicationContext();
   const { db, cache } = ctx.external;

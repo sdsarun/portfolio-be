@@ -5,6 +5,7 @@ export type ProjectExperienceRepository = {
   findById(id: string): Promise<ProjectExperience | null>;
   updateById(id: string, attributes: Partial<ProjectExperienceAttributes>): Promise<ProjectExperience>;
   deleteById(id: string): Promise<void>;
+  findByProfileId(profileId: string): Promise<ProjectExperience[]>;
   findAll(): Promise<ProjectExperience[]>;
   upsert(attributes: Partial<ProjectExperienceAttributes>): Promise<ProjectExperience>;
 };

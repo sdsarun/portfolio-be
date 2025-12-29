@@ -47,6 +47,14 @@ export class PrismaProjectExperienceRepository implements ProjectExperienceRepos
     });
   }
 
+  async findByProfileId(profileId: string): Promise<ProjectExperience[]> {
+    const records = await this.prisma.projectExperience.findMany({
+      where: { profileId, deletedAt: null },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
+    });
+    return records.map(this.toEntity);
+  }
+
   async findAll(): Promise<ProjectExperience[]> {
     const records = await this.prisma.projectExperience.findMany({
       where: { deletedAt: null },

@@ -35,6 +35,14 @@ export class PrismaEducationRepository implements EducationRepository {
     await this.prisma.education.update({ where: { id }, data: { deletedAt: new Date() } });
   }
 
+  async findByProfileId(profileId: string): Promise<Education[]> {
+    const records = await this.prisma.education.findMany({
+      where: { profileId, deletedAt: null },
+      orderBy: [{ updatedAt: "desc" }]
+    });
+    return records.map(this.toEntity);
+  }
+
   async findAll(): Promise<Education[]> {
     const records = await this.prisma.education.findMany({
       where: { deletedAt: null },

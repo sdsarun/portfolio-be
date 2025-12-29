@@ -5,6 +5,7 @@ export type EducationRepository = {
   findById(id: string): Promise<Education | null>;
   updateById(id: string, attributes: Partial<EducationAttributes>): Promise<Education>;
   deleteById(id: string): Promise<void>;
+  findByProfileId(profileId: string): Promise<Education[]>;
   findAll(): Promise<Education[]>;
   upsert(attributes: Partial<EducationAttributes>): Promise<Education>;
 };

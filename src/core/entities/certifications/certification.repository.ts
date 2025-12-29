@@ -5,6 +5,7 @@ export type CertificationRepository = {
   findById(id: string): Promise<Certification | null>;
   updateById(id: string, attributes: Partial<CertificationAttributes>): Promise<Certification>;
   deleteById(id: string): Promise<void>;
+  findByProfileId(profileId: string): Promise<Certification[]>;
   findAll(): Promise<Certification[]>;
   upsert(attributes: Partial<CertificationAttributes>): Promise<Certification>;
 };

@@ -12,7 +12,12 @@ export type GetProfileLatestUpdatedUseCasePort = UseCase<
 >;
 
 export class GetProfileLatestUpdatedUseCase implements GetProfileLatestUpdatedUseCasePort {
-  constructor(private readonly deps: { uow: UnitOfWork }) {}
+  constructor(
+    private readonly deps: {
+      uow: UnitOfWork;
+      authId: string;
+    }
+  ) {}
 
   async execute(input: GetProfileLatestUpdatedInput = {}): Promise<GetProfileLatestUpdatedOutput> {
     const groups = input.groups;
@@ -22,20 +27,8 @@ export class GetProfileLatestUpdatedUseCase implements GetProfileLatestUpdatedUs
     const needWork = includeAll || groups.includes("work") || needResume;
     const needContact = includeAll || groups.includes("contact");
 
-    let profilesPromise: Promise<Awaited<ReturnType<UnitOfWork["profile"]["findAll"]>>> | null = null;
-    let workPromise: Promise<Awaited<ReturnType<UnitOfWork["workExperience"]["findAll"]>>> | null = null;
-    let skillPromise: Promise<Awaited<ReturnType<UnitOfWork["skill"]["findAll"]>>> | null = null;
-    let educationPromise: Promise<Awaited<ReturnType<UnitOfWork["education"]["findAll"]>>> | null = null;
-    let certificationPromise: Promise<Awaited<ReturnType<UnitOfWork["certification"]["findAll"]>>> | null = null;
-    let contactPromise: Promise<Awaited<ReturnType<UnitOfWork["contact"]["findAll"]>>> | null = null;
-
-    const getProfiles = () => (profilesPromise ??= this.deps.uow.profile.findAll());
-    const getWork = () => (workPromise ??= this.deps.uow.workExperience.findAll());
-    const getSkills = () => (skillPromise ??= this.deps.uow.skill.findAll());
-    const getEducation = () => (educationPromise ??= this.deps.uow.education.findAll());
-    const getCertifications = () =>
-      (certificationPromise ??= this.deps.uow.certification.findAll());
-    const getContacts = () => (contactPromise ??= this.deps.uow.contact.findAll());
+    const profile = await this.deps.uow.profile.findByAuthId(this.deps.authId);
+    const profileId = profile?.fields.id ?? null;
 
     const result: GetProfileLatestUpdatedOutput = {
       info: null,
@@ -44,21 +37,49 @@ export class GetProfileLatestUpdatedUseCase implements GetProfileLatestUpdatedUs
       contact: null
     };
 
+    if (!profileId) {
+      return includeAll ? result : this.filterResult(result, groups);
+    }
+
+    const profileUpdatedAt = profile?.fields.updatedAt ?? null;
+
+    let workPromise:
+      | Promise<Awaited<ReturnType<UnitOfWork["workExperience"]["findByProfileId"]>>>
+      | null = null;
+    let skillPromise: Promise<Awaited<ReturnType<UnitOfWork["skill"]["findByProfileId"]>>> | null =
+      null;
+    let educationPromise:
+      | Promise<Awaited<ReturnType<UnitOfWork["education"]["findByProfileId"]>>>
+      | null = null;
+    let certificationPromise:
+      | Promise<Awaited<ReturnType<UnitOfWork["certification"]["findByProfileId"]>>>
+      | null = null;
+    let contactPromise:
+      | Promise<Awaited<ReturnType<UnitOfWork["contact"]["findByProfileId"]>>>
+      | null = null;
+
+    const getWork = () =>
+      (workPromise ??= this.deps.uow.workExperience.findByProfileId(profileId));
+    const getSkills = () => (skillPromise ??= this.deps.uow.skill.findByProfileId(profileId));
+    const getEducation = () =>
+      (educationPromise ??= this.deps.uow.education.findByProfileId(profileId));
+    const getCertifications = () =>
+      (certificationPromise ??= this.deps.uow.certification.findByProfileId(profileId));
+    const getContacts = () => (contactPromise ??= this.deps.uow.contact.findByProfileId(profileId));
+
     if (needInfo) {
-      const profiles = await getProfiles();
-      result.info = this.maxDate(profiles.map((item) => item.fields.updatedAt));
+      result.info = this.maxDate([profileUpdatedAt]);
     }
 
     if (needResume) {
-      const [profiles, skills, education, certifications, workExperiences] = await Promise.all([
-        getProfiles(),
+      const [skills, education, certifications, workExperiences] = await Promise.all([
         getSkills(),
         getEducation(),
         getCertifications(),
         getWork()
       ]);
       result.resume = this.maxDate([
-        ...profiles.map((item) => item.fields.updatedAt),
+        profileUpdatedAt,
         ...skills.map((item) => item.fields.updatedAt),
         ...education.map((item) => item.fields.updatedAt),
         ...certifications.map((item) => item.fields.updatedAt),
@@ -80,9 +101,7 @@ export class GetProfileLatestUpdatedUseCase implements GetProfileLatestUpdatedUs
       return result;
     }
 
-    return Object.fromEntries(
-      Object.entries(result).filter(([key]) => groups.includes(key as keyof typeof result))
-    ) as GetProfileLatestUpdatedOutput;
+    return this.filterResult(result, groups);
   }
 
   private maxDate(dates: (Date | null | undefined)[]): Date | null {
@@ -92,5 +111,15 @@ export class GetProfileLatestUpdatedUseCase implements GetProfileLatestUpdatedUs
       .filter((t) => !Number.isNaN(t));
     if (timestamps.length === 0) return null;
     return new Date(Math.max(...timestamps));
+  }
+
+  private filterResult(
+    result: GetProfileLatestUpdatedOutput,
+    groups?: GetProfileLatestUpdatedInput["groups"]
+  ): GetProfileLatestUpdatedOutput {
+    if (!groups) return result;
+    return Object.fromEntries(
+      Object.entries(result).filter(([key]) => groups.includes(key as keyof typeof result))
+    ) as GetProfileLatestUpdatedOutput;
   }
 }

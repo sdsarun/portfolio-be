@@ -32,6 +32,14 @@ export class PrismaSkillRepository implements SkillRepository {
     await this.prisma.skill.update({ where: { id }, data: { deletedAt: new Date() } });
   }
 
+  async findByProfileId(profileId: string): Promise<Skill[]> {
+    const records = await this.prisma.skill.findMany({
+      where: { profileId, deletedAt: null },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
+    });
+    return records.map(this.toEntity);
+  }
+
   async findAll(): Promise<Skill[]> {
     const records = await this.prisma.skill.findMany({
       where: { deletedAt: null },
