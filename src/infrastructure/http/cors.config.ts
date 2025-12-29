@@ -17,21 +17,11 @@ function parseOrigins(input: string): string[] {
 }
 
 export function getCorsConfig(): CorsConfig {
-  switch (env.NODE_ENV) {
-    case "production": {
-      return {
-        origin: parseOrigins(env.CORS_ALLOWED_ORIGIN),
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Accept", "Content-Type", "Authorization", "Origin", "Accept-Language"],
-        maxAge: 3600
-      };
-    }
-    default: {
-      return {
-        origin: "*",
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-      };
-    }
-  }
+  return {
+    origin: parseOrigins(env.CORS_ALLOWED_ORIGIN),
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Accept", "Content-Type", "Authorization", "Origin", "Accept-Language"],
+    maxAge: env.CORS_MAX_AGE
+  };
 }
