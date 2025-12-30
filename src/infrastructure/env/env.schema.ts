@@ -18,7 +18,9 @@ export const envSchema = z.object({
     .refine((corsAllowedOrigin) => corsAllowedOrigin !== "*", {
       message: "CORS_ALLOWED_ORIGIN '*' is not allowed"
     }),
-  CORS_MAX_AGE: z.coerce.number().int().nonnegative().default(3600)
+  CORS_MAX_AGE: z.coerce.number().int().nonnegative().default(3600),
+  GITHUB_TOKEN: z.string().min(1, "GITHUB_TOKEN is required"),
+  GITHUB_STORAGE_REPO_NAME: z.string().min(1, "GITHUB_STORAGE_REPO_NAME is required")
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

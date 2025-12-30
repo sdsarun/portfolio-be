@@ -37,6 +37,10 @@ import { GetProfileInfoHandler } from "../../adapters/http/routes/profile/handle
 import { GetProfileResumeHandler } from "../../adapters/http/routes/profile/handlers/get-resume/get-profile-resume.handler";
 import { GetProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/get-work/get-profile-work.handler";
 import { GetProfileContactHandler } from "../../adapters/http/routes/profile/handlers/get-contact/get-profile-contact.handler";
+import { GithubFileStorageRepository } from "../github/github-file-storage.repository";
+import { logger } from "../logger/logger";
+import { ForDevelopmentOnlyUseCase } from "../../core/usecases/for-development-only/for-development-only.usecase";
+import { TestHandler } from "../../adapters/http/routes/system/handlers/test/test.handler";
 
 export type ApplicationContext = {
   external: {
@@ -62,6 +66,18 @@ export function createApplicationContext(): ApplicationContext {
     secret: env.PASSWORD_PEPPER,
     defaultExpiresIn: env.TOKEN_EXP,
     defaultIssuer: env.SERVICE_NAME
+  });
+
+  // storages
+  const githubFileStorageRepository = new GithubFileStorageRepository({
+    token: env.GITHUB_TOKEN,
+    repoName: env.GITHUB_STORAGE_REPO_NAME,
+    log: {
+      debug: logger.debug,
+      error: logger.error,
+      info: logger.info,
+      warn: logger.warn
+    }
   });
 
   // middlewares
@@ -137,7 +153,9 @@ export function createApplicationContext(): ApplicationContext {
     pingCheck: fetchHttpPingHealthCheck,
     portfolioSiteUrl: env.PORTFOLIO_SITE_URL
   });
-  const systemRoutes = new SystemRoutes({ healthHandler });
+  const testUseCase = new ForDevelopmentOnlyUseCase(githubFileStorageRepository);
+  const testHandler = new TestHandler({ testUseCase });
+  const systemRoutes = new SystemRoutes({ healthHandler, testHandler });
 
   return {
     external: {
