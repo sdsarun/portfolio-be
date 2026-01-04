@@ -72,15 +72,16 @@ model Skill {
 }
 
 model Education {
-  id          String    @id @default(uuid()) @db.Uuid
-  profileId   String?   @map("profile_id") @db.Uuid
-  major       String?   @db.Text
-  institution String?   @db.Text
-  startDate   DateTime? @map("start_date") @db.Date
-  endDate     DateTime? @map("end_date") @db.Date
-  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
-  profile     Profile?  @relation(fields: [profileId], references: [id])
+  id           String    @id @default(uuid()) @db.Uuid
+  profileId    String?   @map("profile_id") @db.Uuid
+  major        String?   @db.Text
+  institution  String?   @db.Text
+  startDate    DateTime? @map("start_date") @db.Date
+  endDate      DateTime? @map("end_date") @db.Date
+  displayOrder Int?      @map("display_order") @db.Integer
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?  @relation(fields: [profileId], references: [id])
 
   @@index([profileId])
   @@map("education")

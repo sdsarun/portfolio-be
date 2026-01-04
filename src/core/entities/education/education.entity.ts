@@ -1,4 +1,4 @@
-import { Entity } from '../base/base.entity';
+import { Entity } from "../base/base.entity";
 
 export type EducationAttributes = {
   id: string | null;
@@ -7,6 +7,7 @@ export type EducationAttributes = {
   institution: string | null;
   startDate: Date | null;
   endDate: Date | null;
+  displayOrder: number | null;
   updatedAt: Date | null;
   deletedAt: Date | null;
 };
@@ -21,7 +22,8 @@ export class Education extends Entity<EducationAttributes> {
       startDate: null,
       endDate: null,
       updatedAt: null,
-      deletedAt: null
+      deletedAt: null,
+      displayOrder: null
     };
   }
 }
