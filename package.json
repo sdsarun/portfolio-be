@@ -11,6 +11,7 @@
     "build:watch": "npm run build -- --watch",
     "prisma": "prisma",
     "db:migrate": "npm run prisma -- migrate deploy",
+    "db:migrate:dev": "npm run prisma -- migrate dev",
     "db:generate": "npm run prisma -- generate",
     "db:seed": "npm run prisma -- db seed",
     "db:studio": "npm run prisma -- studio",
