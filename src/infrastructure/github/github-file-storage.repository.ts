@@ -3,76 +3,166 @@ import {
   type UpsertRepositoryFileInput,
   type UpsertRepositoryFileOutput,
   type FileStorageRepositoryPort,
-  DeleteRepositoryFileOutput
+  type DeleteRepositoryFileOutput,
+  type GetRepositoryFileInput,
+  type GetRepositoryFileOutput
 } from "../../core/ports/file-storage-repository.port";
 import { Octokit, type OctokitOptions } from "@octokit/core";
 
 export type GithubFileStorageOptions = Pick<OctokitOptions, "log"> & {
   token: string;
   repoName: string;
+  directoryPath: string;
+  apiVersion: string;
 };
 
 export class GithubFileStorageRepository implements FileStorageRepositoryPort {
   private readonly client: Octokit;
   private readonly repoName: string;
+  private readonly directoryPath: string;
+  private readonly apiVersion: string;
 
-  constructor({ token, repoName, ...options }: GithubFileStorageOptions) {
+  constructor({ token, repoName, directoryPath, apiVersion, ...options }: GithubFileStorageOptions) {
     this.client = new Octokit({ auth: token, ...options });
     this.repoName = repoName;
-    void this.repoName;
+    this.directoryPath = directoryPath;
+    this.apiVersion = apiVersion;
+  }
+
+  async getFile(input: GetRepositoryFileInput): Promise<GetRepositoryFileOutput> {
+    try {
+      const userInfo = await this.getAuthenticatedUser();
+
+      console.log(
+        "🚀 ~ GithubFileStorageRepository ~ getFile ~ this.joinPath(this.directoryPath, input.file.path):",
+        this.joinPath(this.directoryPath, input.file.path)
+      );
+      const result = await this.client.request("GET /repos/{owner}/{repo}/contents/{path}", {
+        owner: userInfo.login,
+        repo: this.repoName,
+        path: this.joinPath(this.directoryPath, input.file.path),
+        headers: {
+          "X-GitHub-Api-Version": this.apiVersion
+        }
+      });
+
+      if ("type" in result.data && result.data.type === "file") {
+        return {
+          success: true,
+          data: {
+            file: {
+              name: result.data?.name,
+              path: result.data?.path,
+              size: result.data?.size,
+              sha: result.data?.sha,
+              url: result.data?.download_url
+            }
+          }
+        };
+      }
+
+      throw new Error(
+        `Expected a file at "${input.file.path}", but GitHub returned a directory or unsupported content type.`
+      );
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: "GITHUB_FILE_GET_ERROR",
+          message: error?.message || "Something went wrong while getting a file from GitHub",
+          cause: error
+        }
+      };
+    }
   }
 
   async upsertFile(input: UpsertRepositoryFileInput): Promise<UpsertRepositoryFileOutput> {
-    console.log(
-      "[LOG] - github-file-storage.repository.ts:25 - GithubFileStorageRepository - upsertFile - input:",
-      input
-    );
-    await this.ensureUserInfo();
-    // const result = await this.client.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-    //   owner: input.repository.owner,
-    //   repo: input.repository.name ?? this.repoName,
-    //   path: input.file.path,
-    //   content: input.file.content,
-    //   message: input.commit.message,
-    //   branch: input.commit.branch,
-    //   committer: input.commit.committer,
-    //   headers: {
-    //     "X-GitHub-Api-Version": "2022-11-28"
-    //   },
-    //   sha: input?.previousSha
-    // });
-    // return {
-    //   success: result.status >= 200 && result.status <= 299,
-    //   data: {
-    //     file: {
-    //       name: result.data.content?.name,
-    //       path: result.data.content?.path,
-    //       size: result.data.content?.size,
-    //       sha: result.data.content?.sha,
-    //       url: result.data.content?.download_url
-    //     }
-    //   }
-    // };
+    try {
+      const userInfo = await this.getAuthenticatedUser();
 
-    return {
-      success: true,
-      data: null as any
-    };
+      const result = await this.client.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+        owner: userInfo.login,
+        repo: this.repoName,
+        path: this.joinPath(this.directoryPath, input.file.path),
+        content: input.file.content,
+        message: `chore(portfolio): added file ${input.file.path}`,
+        headers: {
+          "X-GitHub-Api-Version": this.apiVersion
+        },
+        sha: input?.sha
+      });
+
+      return {
+        success: true,
+        data: {
+          file: {
+            name: result.data.content?.name,
+            path: result.data.content?.path,
+            size: result.data.content?.size,
+            sha: result.data.content?.sha,
+            url: result.data.content?.download_url
+          }
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: "GITHUB_FILE_UPSERT_ERROR",
+          message: error?.message || "Something went wrong while upserting a file in GitHub",
+          cause: error
+        }
+      };
+    }
   }
 
-  deleteFile(input: DeleteRepositoryFileInput): Promise<DeleteRepositoryFileOutput> {
-    console.log(
-      "[LOG] - github-file-storage.repository.ts:59 - GithubFileStorageRepository - deleteFile - input:",
-      input
-    );
-    throw new Error("Method not implemented.");
+  async deleteFile(input: DeleteRepositoryFileInput): Promise<DeleteRepositoryFileOutput> {
+    try {
+      const { login } = await this.getAuthenticatedUser();
+
+      const result = await this.client.request("DELETE /repos/{owner}/{repo}/contents/{path}", {
+        owner: login,
+        repo: this.repoName,
+        path: this.joinPath(this.directoryPath, input.file.path),
+        message: `chore(portfolio): deleted file ${input.file.path}`,
+        sha: input.sha,
+        headers: {
+          "X-GitHub-Api-Version": this.apiVersion
+        }
+      });
+
+      return {
+        success: true,
+        data: {
+          file: {
+            name: result.data.content?.name,
+            path: result.data.content?.path,
+            size: result.data.content?.size,
+            sha: result.data.content?.sha,
+            url: result.data.content?.download_url
+          }
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: "GITHUB_FILE_DELETE_ERROR",
+          message: error?.message || "Something went wrong while deleting a file from GitHub",
+          cause: error
+        }
+      };
+    }
   }
 
-  private async ensureUserInfo() {
+  private joinPath(dir: string = "", filePath: string = "") {
+    const directory = dir.replace(/\/+$/, "");
+    const file = filePath.replace(/^\/+/, "");
+    return directory ? `${directory}/${file}` : file;
+  }
+
+  private async getAuthenticatedUser() {
     const userInfo = await this.client.request("GET /user");
-    console.log(
-      "[LOG] - github-file-storage.repository.ts:57 - GithubFileStorageRepository - ensureUserInfo - userInfo:",
-      userInfo
-    );
+    return userInfo.data;
   }
 }

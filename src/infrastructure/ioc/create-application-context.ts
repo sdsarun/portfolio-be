@@ -72,6 +72,8 @@ export function createApplicationContext(): ApplicationContext {
   const githubFileStorageRepository = new GithubFileStorageRepository({
     token: env.GITHUB_TOKEN,
     repoName: env.GITHUB_STORAGE_REPO_NAME,
+    apiVersion: env.GITHUB_API_VERSION,
+    directoryPath: env.GITHUB_STORAGE_DIRECTORY_PATH,
     log: {
       debug: logger.debug,
       error: logger.error,
