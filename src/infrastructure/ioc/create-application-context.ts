@@ -39,8 +39,6 @@ import { GetProfileWorkHandler } from "../../adapters/http/routes/profile/handle
 import { GetProfileContactHandler } from "../../adapters/http/routes/profile/handlers/get-contact/get-profile-contact.handler";
 import { GithubFileStorageRepository } from "../github/github-file-storage.repository";
 import { logger } from "../logger/logger";
-import { ForDevelopmentOnlyUseCase } from "../../core/usecases/for-development-only/for-development-only.usecase";
-import { TestHandler } from "../../adapters/http/routes/system/handlers/test/test.handler";
 
 export type ApplicationContext = {
   external: {
@@ -155,9 +153,7 @@ export function createApplicationContext(): ApplicationContext {
     pingCheck: fetchHttpPingHealthCheck,
     portfolioSiteUrl: env.PORTFOLIO_SITE_URL
   });
-  const testUseCase = new ForDevelopmentOnlyUseCase(githubFileStorageRepository);
-  const testHandler = new TestHandler({ testUseCase });
-  const systemRoutes = new SystemRoutes({ healthHandler, testHandler });
+  const systemRoutes = new SystemRoutes({ healthHandler });
 
   return {
     external: {
