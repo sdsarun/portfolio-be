@@ -37,6 +37,8 @@ import { GetProfileInfoHandler } from "../../adapters/http/routes/profile/handle
 import { GetProfileResumeHandler } from "../../adapters/http/routes/profile/handlers/get-resume/get-profile-resume.handler";
 import { GetProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/get-work/get-profile-work.handler";
 import { GetProfileContactHandler } from "../../adapters/http/routes/profile/handlers/get-contact/get-profile-contact.handler";
+import { GithubFileStorageRepository } from "../github/github-file-storage.repository";
+import { logger } from "../logger/logger";
 
 export type ApplicationContext = {
   external: {
@@ -62,6 +64,20 @@ export function createApplicationContext(): ApplicationContext {
     secret: env.PASSWORD_PEPPER,
     defaultExpiresIn: env.TOKEN_EXP,
     defaultIssuer: env.SERVICE_NAME
+  });
+
+  // storages
+  const githubFileStorageRepository = new GithubFileStorageRepository({
+    token: env.GITHUB_TOKEN,
+    repoName: env.GITHUB_STORAGE_REPO_NAME,
+    apiVersion: env.GITHUB_API_VERSION,
+    directoryPath: env.GITHUB_STORAGE_DIRECTORY_PATH,
+    log: {
+      debug: logger.debug,
+      error: logger.error,
+      info: logger.info,
+      warn: logger.warn
+    }
   });
 
   // middlewares
