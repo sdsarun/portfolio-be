@@ -33,10 +33,6 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
     try {
       const userInfo = await this.getAuthenticatedUser();
 
-      console.log(
-        "🚀 ~ GithubFileStorageRepository ~ getFile ~ this.joinPath(this.directoryPath, input.file.path):",
-        this.joinPath(this.directoryPath, input.file.path)
-      );
       const result = await this.client.request("GET /repos/{owner}/{repo}/contents/{path}", {
         owner: userInfo.login,
         repo: this.repoName,
