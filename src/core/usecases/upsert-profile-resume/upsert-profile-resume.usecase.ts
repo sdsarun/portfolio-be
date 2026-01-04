@@ -1,7 +1,7 @@
-import { Certification } from "../../entities/certifications/certifications.entity";
-import { Education } from "../../entities/education/education.entity";
-import { Skill } from "../../entities/skill/skill.entity";
-import { WorkExperience } from "../../entities/work-experience/work-experience.entity";
+import { type Certification } from "../../entities/certifications/certifications.entity";
+import { type Education } from "../../entities/education/education.entity";
+import { type Skill } from "../../entities/skill/skill.entity";
+import { type WorkExperience } from "../../entities/work-experience/work-experience.entity";
 import { type UnitOfWork } from "../../ports/unit-of-work.port";
 import { type UseCase } from "../base/base.usecase";
 import { type UpsertProfileResumeInput } from "./upsert-profile-resume.input";
