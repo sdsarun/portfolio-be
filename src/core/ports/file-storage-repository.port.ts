@@ -1,26 +1,52 @@
-type FileStorageRepositoryOutput<Data = any> = {
-  success: boolean;
-  data: Data;
+type FileStorageRepositoryOutput<Data = any, Error = any> =
+  | {
+      success: true;
+      data: Data;
+    }
+  | {
+      success: false;
+      error: {
+        code: string;
+        message: string;
+        cause: Error;
+      };
+    };
+
+export type GetRepositoryFileInput = {
+  file: {
+    path: string;
+  };
 };
+
+export type GetRepositoryFileOutput = FileStorageRepositoryOutput<{
+  file?: {
+    name?: string;
+    path?: string;
+    sha?: string;
+    size?: number;
+    url?: string | null;
+  };
+}>;
 
 export type UpsertRepositoryFileInput = {
   file: {
     path: string;
     content: string;
   };
-  repository?: {
-    owner: string;
-    name: string;
-  };
-  commit?: {
-    message: string;
-    branch: string;
-    committer: {
-      name: string;
-      email: string;
-    };
-  };
-  previousSha?: string; // for update existing
+  sha?: string; // for update existing
+  // NOTE: not need right now
+  // repository?: {
+  //   owner: string;
+  //   name: string;
+  // };
+  // commit?: {
+  //   message: string;
+  //   branch: string;
+  //   committer: {
+  //     name: string;
+  //     email: string;
+  //   };
+  // };
 };
 
 export type UpsertRepositoryFileOutput = FileStorageRepositoryOutput<{
@@ -31,34 +57,26 @@ export type UpsertRepositoryFileOutput = FileStorageRepositoryOutput<{
     size?: number;
     url?: string;
   };
-  // commit: {
-  //   sha: string;
-  //   message: string;
-  //   author: {
-  //     name: string;
-  //     email: string;
-  //     date: string;
-  //   };
-  // };
 }>;
 
 export type DeleteRepositoryFileInput = {
-  repository: {
-    owner: string;
-    name: string;
-  };
   file: {
     path: string;
   };
-  commit: {
-    message: string;
-    branch: string;
-    committer: {
-      name: string;
-      email: string;
-    };
-  };
   sha: string;
+  // NOTE: not need right now
+  // repository: {
+  //   owner: string;
+  //   name: string;
+  // };
+  // commit: {
+  //   message: string;
+  //   branch: string;
+  //   committer: {
+  //     name: string;
+  //     email: string;
+  //   };
+  // };
 };
 
 export type DeleteRepositoryFileOutput = FileStorageRepositoryOutput<{
@@ -69,18 +87,10 @@ export type DeleteRepositoryFileOutput = FileStorageRepositoryOutput<{
     size?: number;
     url?: string;
   };
-  // commit: {
-  //   sha: string;
-  //   message: string;
-  //   author: {
-  //     name: string;
-  //     email: string;
-  //     date: string;
-  //   };
-  // };
 }>;
 
 export type FileStorageRepositoryPort = {
+  getFile(input: GetRepositoryFileInput): Promise<GetRepositoryFileOutput>;
   upsertFile(input: UpsertRepositoryFileInput): Promise<UpsertRepositoryFileOutput>;
   deleteFile(input: DeleteRepositoryFileInput): Promise<DeleteRepositoryFileOutput>;
 };
