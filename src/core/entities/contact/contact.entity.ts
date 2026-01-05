@@ -1,4 +1,4 @@
-import { Entity } from '../base/base.entity';
+import { Entity } from "../base/base.entity";
 
 export type ContactAttributes = {
   id: string | null;
@@ -8,6 +8,7 @@ export type ContactAttributes = {
   label: string | null;
   displayValue: string | null;
   displayOrder: number | null;
+  createdAt: Date | null;
   updatedAt: Date | null;
   deletedAt: Date | null;
 };
@@ -22,6 +23,7 @@ export class Contact extends Entity<ContactAttributes> {
       label: null,
       displayValue: null,
       displayOrder: null,
+      createdAt: null,
       updatedAt: null,
       deletedAt: null
     };

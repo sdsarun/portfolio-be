@@ -8,6 +8,7 @@ export type EducationAttributes = {
   startDate: Date | null;
   endDate: Date | null;
   displayOrder: number | null;
+  createdAt: Date | null;
   updatedAt: Date | null;
   deletedAt: Date | null;
 };
@@ -21,6 +22,7 @@ export class Education extends Entity<EducationAttributes> {
       institution: null,
       startDate: null,
       endDate: null,
+      createdAt: null,
       updatedAt: null,
       deletedAt: null,
       displayOrder: null
