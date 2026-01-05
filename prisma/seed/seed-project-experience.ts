@@ -7,8 +7,9 @@ type ProjectSeed = {
   startDate?: Date | null;
   endDate?: Date | null;
   isInProgress?: boolean | null;
-  tags?: string[];
-  links?: Array<{ name: string; url: string | null }>;
+  tags: string[];
+  links: Array<{ name: string; url: string | null }>;
+  attachments: Array<{ storedPath: string }>;
 };
 
 const projectSeedData: ProjectSeed[] = [
@@ -22,7 +23,8 @@ const projectSeedData: ProjectSeed[] = [
     links: [
       { name: "Live", url: null },
       { name: "GitHub", url: null }
-    ]
+    ],
+    attachments: []
   },
   {
     title: "No More Random AD",
@@ -34,7 +36,8 @@ const projectSeedData: ProjectSeed[] = [
     links: [
       { name: "Live", url: null },
       { name: "GitHub", url: null }
-    ]
+    ],
+    attachments: []
   },
   {
     title: "Coastal Sea Depth Platform",
@@ -42,7 +45,8 @@ const projectSeedData: ProjectSeed[] = [
       "Coastal depth survey data, enabling the display of various map layers, including base maps, satellite and digital elevation models (DEM).",
     startDate: new Date("2024-01-01"),
     tags: [],
-    links: [{ name: "Live", url: null }]
+    links: [{ name: "Live", url: null }],
+    attachments: []
   },
   {
     title: "Smart Tax",
@@ -51,7 +55,8 @@ const projectSeedData: ProjectSeed[] = [
     startDate: new Date("2023-01-01"),
     endDate: new Date("2025-01-01"),
     tags: [],
-    links: [{ name: "Landing", url: null }]
+    links: [{ name: "Landing", url: null }],
+    attachments: []
   },
   {
     title: "xx-portfolio",
@@ -61,20 +66,26 @@ const projectSeedData: ProjectSeed[] = [
     links: [
       { name: "Live", url: null },
       { name: "GitHub", url: null }
-    ]
+    ],
+    attachments: []
   }
 ];
 
 export async function seedProjectExperience(db: PrismaClientOrTransaction, profileId: string) {
-  const exists = await db.projectExperience.findFirst({
+  const exists = await db.projectExperience.findMany({
     where: { profileId }
   });
 
   logger.info({ exists }, "projectExperience exists");
 
-  if (!exists) {
+  if (exists.length === 0) {
     for (const [index, project] of projectSeedData.entries()) {
-      const created = await db.projectExperience.create({
+      const attachmentCreated = await db.attachment.createManyAndReturn({
+        data: project.attachments,
+        skipDuplicates: true
+      });
+
+      await db.projectExperience.create({
         data: {
           profileId,
           title: project.title,
@@ -83,22 +94,31 @@ export async function seedProjectExperience(db: PrismaClientOrTransaction, profi
           startDate: project.startDate ?? null,
           endDate: project.endDate ?? null,
           tags: project.tags?.join(", ") ?? null,
-          displayOrder: index + 1
+          displayOrder: index + 1,
+          projectLinks: {
+            createMany: {
+              data: project?.links?.map?.((link) => ({
+                name: link.name,
+                url: link.url
+              })),
+              skipDuplicates: true
+            }
+          },
+          projectExperienceAttachments: {
+            createMany: {
+              data: attachmentCreated.map((a) => ({ attachmentId: a.id })),
+              skipDuplicates: true
+            }
+          }
+        },
+        include: {
+          projectLinks: true
         }
       });
-
-      if (project.links?.length) {
-        await db.projectLink.createMany({
-          data: project.links.map((link) => ({
-            projectId: created.id,
-            name: link.name,
-            url: link.url
-          }))
-        });
-      }
     }
     logger.info("projectExperience not exists, created.");
   } else {
     logger.info("projectExperience exists, skip created.");
+    return exists;
   }
 }

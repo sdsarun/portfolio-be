@@ -1,16 +1,7 @@
-import {
-  type HttpContext,
-  type HttpHandler,
-  type HttpResponse
-} from "../../../../http-adapter.port";
+import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
+import { type UpsertProfileResumeUseCasePort } from "../../../../../../core/usecases/upsert-profile-resume/upsert-profile-resume.usecase";
 import { ValidationError } from "../../../../../../core/errors/validation.error";
-import {
-  type UpsertProfileResumeUseCasePort
-} from "../../../../../../core/usecases/upsert-profile-resume/upsert-profile-resume.usecase";
-import {
-  UpsertProfileResumeDTO,
-  upsertProfileResumeInputDTOSchema
-} from "./upsert-profile-resume.dto";
+import { UpsertProfileResumeDTO, upsertProfileResumeInputDTOSchema } from "./upsert-profile-resume.dto";
 
 export type UpsertProfileResumeHandlerPort = HttpHandler<{ body: UpsertProfileResumeDTO }>;
 

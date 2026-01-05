@@ -1,4 +1,4 @@
-import { Profile, ProfileAttributes } from "./profile.entity";
+import { type Profile, type ProfileAttributes } from "./profile.entity";
 
 export type ProfileRepository = {
   create(attributes: Partial<ProfileAttributes>): Promise<Profile>;

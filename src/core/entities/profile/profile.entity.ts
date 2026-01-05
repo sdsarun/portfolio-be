@@ -1,4 +1,4 @@
-import { Entity } from '../base/base.entity';
+import { Entity } from "../base/base.entity";
 
 export type ProfileAttributes = {
   authId: string | null;
@@ -7,6 +7,7 @@ export type ProfileAttributes = {
   roleName: string | null;
   bioTitle: string | null;
   bioDescription: string | null;
+  createdAt: Date | null;
   updatedAt: Date | null;
   resumeUrl: string | null;
   siteUrl: string | null;
@@ -21,6 +22,7 @@ export class Profile extends Entity<ProfileAttributes> {
       roleName: null,
       bioTitle: null,
       bioDescription: null,
+      createdAt: null,
       updatedAt: null,
       resumeUrl: null,
       siteUrl: null

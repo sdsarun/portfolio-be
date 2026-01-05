@@ -1,4 +1,4 @@
-import { WorkExperience, WorkExperienceAttributes } from "./work-experience.entity";
+import { type WorkExperience, type WorkExperienceAttributes } from "./work-experience.entity";
 
 export type WorkExperienceRepository = {
   create(attributes: Partial<WorkExperienceAttributes>): Promise<WorkExperience>;

@@ -32,13 +32,37 @@ export class PrismaProjectLinkRepository implements ProjectLinkRepository {
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.prisma.projectLink.update({ where: { id }, data: { deletedAt: new Date() } });
+    await this.prisma.projectLink.delete({ where: { id } });
   }
 
-  async findAll(): Promise<ProjectLink[]> {
+  async deleteByProjectId(id: string): Promise<void> {
+    await this.prisma.projectLink.deleteMany({
+      where: { projectId: id }
+    });
+  }
+
+  async softDeleteByIds(id: string[]): Promise<void> {
+    await this.prisma.projectExperienceAttachment.updateMany({
+      data: { deletedAt: new Date() },
+      where: { id: { in: id } }
+    });
+  }
+
+  async softDeleteByProjectIds(id: string[]): Promise<void> {
+    await this.prisma.projectExperienceAttachment.updateMany({
+      data: { deletedAt: new Date() },
+      where: { projectId: { in: id } }
+    });
+  }
+
+  async findManyByProjectIds(id: string[]): Promise<ProjectLink[]> {
     const records = await this.prisma.projectLink.findMany({
-      where: { deletedAt: null },
-      orderBy: [{ updatedAt: "desc" }]
+      where: {
+        projectId: {
+          in: id
+        },
+        deletedAt: null
+      }
     });
     return records.map(this.toEntity);
   }

@@ -41,23 +41,19 @@ export class PrismaProjectExperienceRepository implements ProjectExperienceRepos
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.prisma.projectExperience.update({
-      where: { id },
-      data: { deletedAt: new Date() }
+    await this.prisma.projectExperience.delete({ where: { id } });
+  }
+
+  async softDeleteByIds(id: string[]): Promise<void> {
+    await this.prisma.projectExperience.updateMany({
+      data: { deletedAt: new Date() },
+      where: { id: { in: id } }
     });
   }
 
   async findByProfileId(profileId: string): Promise<ProjectExperience[]> {
     const records = await this.prisma.projectExperience.findMany({
       where: { profileId, deletedAt: null },
-      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
-    });
-    return records.map(this.toEntity);
-  }
-
-  async findAll(): Promise<ProjectExperience[]> {
-    const records = await this.prisma.projectExperience.findMany({
-      where: { deletedAt: null },
       orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }]
     });
     return records.map(this.toEntity);

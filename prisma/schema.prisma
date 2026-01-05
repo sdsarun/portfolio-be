@@ -10,6 +10,7 @@ datasource db {
 model Auth {
   id           String   @id @default(uuid()) @db.Uuid
   hashPassword String?  @map("hash_password") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   profile      Profile?
 
@@ -23,6 +24,7 @@ model Profile {
   roleName           String?             @map("role_name") @db.Text
   bioTitle           String?             @map("bio_title") @db.Text
   bioDescription     String?             @map("bio_description") @db.Text
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   resumeUrl          String?             @map("resume_url") @db.Text
   siteUrl            String?             @map("site_url") @db.Text
@@ -49,6 +51,7 @@ model WorkExperience {
   isCurrent    Boolean?  @map("is_current") @db.Boolean
   description  String?   @db.Text
   displayOrder Int?      @map("display_order") @db.Integer
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
   profile      Profile?  @relation(fields: [profileId], references: [id])
@@ -63,6 +66,7 @@ model Skill {
   categoryName String?   @map("category_name") @db.Text
   skillNames   String?   @map("skill_names") @db.Text
   displayOrder Int?      @map("display_order") @db.Integer
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
   profile      Profile?  @relation(fields: [profileId], references: [id])
@@ -72,15 +76,17 @@ model Skill {
 }
 
 model Education {
-  id          String    @id @default(uuid()) @db.Uuid
-  profileId   String?   @map("profile_id") @db.Uuid
-  major       String?   @db.Text
-  institution String?   @db.Text
-  startDate   DateTime? @map("start_date") @db.Date
-  endDate     DateTime? @map("end_date") @db.Date
-  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
-  profile     Profile?  @relation(fields: [profileId], references: [id])
+  id           String    @id @default(uuid()) @db.Uuid
+  profileId    String?   @map("profile_id") @db.Uuid
+  major        String?   @db.Text
+  institution  String?   @db.Text
+  startDate    DateTime? @map("start_date") @db.Date
+  endDate      DateTime? @map("end_date") @db.Date
+  displayOrder Int?      @map("display_order") @db.Integer
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  profile      Profile?  @relation(fields: [profileId], references: [id])
 
   @@index([profileId])
   @@map("education")
@@ -93,6 +99,7 @@ model Certification {
   issuer       String?   @db.Text
   completeDate DateTime? @map("complete_date") @db.Date
   displayOrder Int?      @map("display_order") @db.Integer
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
   profile      Profile?  @relation(fields: [profileId], references: [id])
@@ -102,20 +109,21 @@ model Certification {
 }
 
 model ProjectExperience {
-  id           String        @id @default(uuid()) @db.Uuid
-  profileId    String?       @map("profile_id") @db.Uuid
-  title        String?       @db.Text
-  isInProgress Boolean?      @map("is_in_progress") @db.Boolean
-  startDate    DateTime?     @map("start_date") @db.Date
-  endDate      DateTime?     @map("end_date") @db.Date
-  imageUrl     String?       @map("image_url") @db.Text
-  description  String?       @db.Text
-  tags         String?       @db.Text
-  displayOrder Int?          @map("display_order") @db.Integer
-  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt    DateTime?     @map("deleted_at") @db.Timestamptz(6)
-  profile      Profile?      @relation(fields: [profileId], references: [id])
-  projectLinks ProjectLink[]
+  id                           String                        @id @default(uuid()) @db.Uuid
+  profileId                    String?                       @map("profile_id") @db.Uuid
+  title                        String?                       @db.Text
+  isInProgress                 Boolean?                      @map("is_in_progress") @db.Boolean
+  startDate                    DateTime?                     @map("start_date") @db.Date
+  endDate                      DateTime?                     @map("end_date") @db.Date
+  description                  String?                       @db.Text
+  tags                         String?                       @db.Text
+  displayOrder                 Int?                          @map("display_order") @db.Integer
+  createdAt                    DateTime                      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                    DateTime                      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                    DateTime?                     @map("deleted_at") @db.Timestamptz(6)
+  profile                      Profile?                      @relation(fields: [profileId], references: [id])
+  projectLinks                 ProjectLink[]
+  projectExperienceAttachments ProjectExperienceAttachment[]
 
   @@index([profileId])
   @@map("project_experience")
@@ -126,6 +134,7 @@ model ProjectLink {
   projectId         String?            @map("project_id") @db.Uuid
   name              String?            @db.Text
   url               String?            @db.Text
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt         DateTime?          @map("deleted_at") @db.Timestamptz(6)
   projectExperience ProjectExperience? @relation(fields: [projectId], references: [id])
@@ -142,10 +151,45 @@ model Contact {
   value        String?   @db.Text
   displayValue String?   @map("display_value") @db.Text
   displayOrder Int?      @map("display_order") @db.Integer
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
   profile      Profile?  @relation(fields: [profileId], references: [id])
 
   @@index([profileId])
   @@map("contact")
+}
+
+model Attachment {
+  id                           String                        @id @default(uuid()) @db.Uuid
+  name                         String?                       @db.Text
+  storageType                  String?                       @map("storage_type") @db.Text
+  storageProvider              String?                       @map("storage_provider") @db.Text
+  size                         Int?                          @db.Integer
+  mime                         String?                       @db.Text
+  sha                          String?                       @db.Text
+  storedPath                   String?                       @map("stored_path") @db.Text
+  streamUrl                    String?                       @map("stream_url") @db.Text
+  createdAt                    DateTime                      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                    DateTime                      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                    DateTime?                     @map("deleted_at") @db.Timestamptz(6)
+  projectExperienceAttachments ProjectExperienceAttachment[]
+
+  @@map("attachments")
+}
+
+model ProjectExperienceAttachment {
+  id           String    @id @default(uuid()) @db.Uuid
+  projectId    String    @map("project_id") @db.Uuid
+  attachmentId String    @map("attachment_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  projectExperience ProjectExperience @relation(fields: [projectId], references: [id])
+  attachment        Attachment        @relation(fields: [attachmentId], references: [id])
+
+  @@index([projectId])
+  @@index([attachmentId])
+  @@map("project_experience_attachments")
 }

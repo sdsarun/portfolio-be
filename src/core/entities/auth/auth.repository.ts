@@ -1,4 +1,4 @@
-import { Auth, AuthAttributes } from "./auth.entity";
+import { type Auth, type AuthAttributes } from "./auth.entity";
 
 export type AuthRepository = {
   create(attributes: Partial<AuthAttributes>): Promise<Auth>;

@@ -1,4 +1,4 @@
-import { Education, EducationAttributes } from "./education.entity";
+import { type Education, type EducationAttributes } from "./education.entity";
 
 export type EducationRepository = {
   create(attributes: Partial<EducationAttributes>): Promise<Education>;

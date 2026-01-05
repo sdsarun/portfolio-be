@@ -1,4 +1,4 @@
-import { Entity } from '../base/base.entity';
+import { Entity } from "../base/base.entity";
 
 export type WorkExperienceAttributes = {
   id: string | null;
@@ -10,6 +10,7 @@ export type WorkExperienceAttributes = {
   isCurrent: boolean | null;
   description: string | null;
   displayOrder: number | null;
+  createdAt: Date | null;
   updatedAt: Date | null;
   deletedAt: Date | null;
 };
@@ -26,6 +27,7 @@ export class WorkExperience extends Entity<WorkExperienceAttributes> {
       isCurrent: null,
       description: null,
       displayOrder: null,
+      createdAt: null,
       updatedAt: null,
       deletedAt: null
     };

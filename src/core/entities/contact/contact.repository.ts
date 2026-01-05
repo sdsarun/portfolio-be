@@ -1,4 +1,4 @@
-import { Contact, ContactAttributes } from "./contact.entity";
+import { type Contact, type ContactAttributes } from "./contact.entity";
 
 export type ContactRepository = {
   create(attributes: Partial<ContactAttributes>): Promise<Contact>;

@@ -1,4 +1,4 @@
-import { Skill, SkillAttributes } from "./skill.entity";
+import { type Skill, type SkillAttributes } from "./skill.entity";
 
 export type SkillRepository = {
   create(attributes: Partial<SkillAttributes>): Promise<Skill>;
