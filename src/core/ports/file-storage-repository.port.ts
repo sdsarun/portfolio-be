@@ -1,24 +1,10 @@
-type FileStorageRepositoryOutput<Data = any, Error = any> =
-  | {
-      success: true;
-      data: Data;
-    }
-  | {
-      success: false;
-      error: {
-        code: string;
-        message: string;
-        cause: Error;
-      };
-    };
-
 export type GetRepositoryFileInput = {
   file: {
     path: string;
   };
 };
 
-export type GetRepositoryFileOutput = FileStorageRepositoryOutput<{
+export type GetRepositoryFileOutput = {
   file?: {
     name?: string;
     path?: string;
@@ -26,7 +12,7 @@ export type GetRepositoryFileOutput = FileStorageRepositoryOutput<{
     size?: number;
     url?: string | null;
   };
-}>;
+};
 
 export type UpsertRepositoryFileInput = {
   file: {
@@ -36,7 +22,7 @@ export type UpsertRepositoryFileInput = {
   sha?: string; // for update existing
 };
 
-export type UpsertRepositoryFileOutput = FileStorageRepositoryOutput<{
+export type UpsertRepositoryFileOutput = {
   file?: {
     name?: string;
     path?: string;
@@ -44,7 +30,7 @@ export type UpsertRepositoryFileOutput = FileStorageRepositoryOutput<{
     size?: number;
     url?: string;
   };
-}>;
+};
 
 export type DeleteRepositoryFileInput = {
   file: {
@@ -53,7 +39,7 @@ export type DeleteRepositoryFileInput = {
   sha: string;
 };
 
-export type DeleteRepositoryFileOutput = FileStorageRepositoryOutput<{
+export type DeleteRepositoryFileOutput = {
   file?: {
     name?: string;
     path?: string;
@@ -61,7 +47,7 @@ export type DeleteRepositoryFileOutput = FileStorageRepositoryOutput<{
     size?: number;
     url?: string;
   };
-}>;
+};
 
 export type FileStorageRepositoryPort = {
   getFile(input: GetRepositoryFileInput): Promise<GetRepositoryFileOutput>;

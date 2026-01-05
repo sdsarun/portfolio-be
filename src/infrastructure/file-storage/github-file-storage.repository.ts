@@ -55,15 +55,12 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
 
       if ("type" in result.data && result.data.type === "file") {
         return {
-          success: true,
-          data: {
-            file: {
-              name: result.data?.name,
-              path: result.data?.path,
-              size: result.data?.size,
-              sha: result.data?.sha,
-              url: result.data?.download_url
-            }
+          file: {
+            name: result.data?.name,
+            path: result.data?.path,
+            size: result.data?.size,
+            sha: result.data?.sha,
+            url: result.data?.download_url
           }
         };
       }
@@ -72,14 +69,7 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
         `Expected a file at "${input.file.path}", but GitHub returned a directory or unsupported content type.`
       );
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "GITHUB_FILE_GET_ERROR",
-          message: error?.message || "Something went wrong while getting a file from GitHub",
-          cause: error
-        }
-      };
+      throw new Error(error?.message || "Something went wrong while getting a file from GitHub");
     }
   }
 
@@ -101,26 +91,16 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
       });
 
       return {
-        success: true,
-        data: {
-          file: {
-            name: result.data.content?.name,
-            path: result.data.content?.path,
-            size: result.data.content?.size,
-            sha: result.data.content?.sha,
-            url: result.data.content?.download_url
-          }
+        file: {
+          name: result.data.content?.name,
+          path: result.data.content?.path,
+          size: result.data.content?.size,
+          sha: result.data.content?.sha,
+          url: result.data.content?.download_url
         }
       };
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "GITHUB_FILE_UPSERT_ERROR",
-          message: error?.message || "Something went wrong while upserting a file in GitHub",
-          cause: error
-        }
-      };
+      throw new Error(error?.message || "Something went wrong while upserting a file in GitHub");
     }
   }
 
@@ -141,26 +121,16 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
       });
 
       return {
-        success: true,
-        data: {
-          file: {
-            name: result.data.content?.name,
-            path: result.data.content?.path,
-            size: result.data.content?.size,
-            sha: result.data.content?.sha,
-            url: result.data.content?.download_url
-          }
+        file: {
+          name: result.data.content?.name,
+          path: result.data.content?.path,
+          size: result.data.content?.size,
+          sha: result.data.content?.sha,
+          url: result.data.content?.download_url
         }
       };
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "GITHUB_FILE_DELETE_ERROR",
-          message: error?.message || "Something went wrong while deleting a file from GitHub",
-          cause: error
-        }
-      };
+      throw new Error(error?.message || "Something went wrong while deleting a file from GitHub");
     }
   }
 

@@ -124,25 +124,21 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
               }
             });
 
-            if (attachmentFileStorageCreated.success) {
-              const attachmentCreated = await uow.attachment.create({
-                name: attachmentFileStorageCreated.data.file?.name,
-                sha: attachmentFileStorageCreated.data.file?.sha,
-                storedPath: attachmentFileStorageCreated.data.file?.path,
-                streamUrl: attachmentFileStorageCreated.data.file?.url,
-                size: attachmentFileStorageCreated.data.file?.size
-              });
+            const attachmentCreated = await uow.attachment.create({
+              name: attachmentFileStorageCreated.file?.name,
+              sha: attachmentFileStorageCreated.file?.sha,
+              storedPath: attachmentFileStorageCreated.file?.path,
+              streamUrl: attachmentFileStorageCreated.file?.url,
+              size: attachmentFileStorageCreated.file?.size
+            });
 
-              await uow.projectExperienceAttachment.create({
-                attachmentId: attachmentCreated.fields.id,
-                projectId
-              });
+            await uow.projectExperienceAttachment.create({
+              attachmentId: attachmentCreated.fields.id,
+              projectId
+            });
 
-              keptIds.add(attachmentCreated.fields.id!);
-              projectAttachmentOutput.push(attachmentCreated.fields);
-            } else {
-              throw attachmentFileStorageCreated.error;
-            }
+            keptIds.add(attachmentCreated.fields.id!);
+            projectAttachmentOutput.push(attachmentCreated.fields);
           } else {
             // Case 2: reference existing
             if (hasId && !hasContent) {
@@ -163,18 +159,16 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
               sha: existingAttachment.fields.sha!
             });
 
-            if (attachmentFileStorageUpdated.success) {
-              const attachmentUpdated = await uow.attachment.updateById(attachmentInputItem.id!, {
-                name: attachmentFileStorageUpdated.data.file?.name,
-                sha: attachmentFileStorageUpdated.data.file?.sha,
-                storedPath: attachmentFileStorageUpdated.data.file?.path,
-                streamUrl: attachmentFileStorageUpdated.data.file?.url,
-                size: attachmentFileStorageUpdated.data.file?.size
-              });
+            const attachmentUpdated = await uow.attachment.updateById(attachmentInputItem.id!, {
+              name: attachmentFileStorageUpdated.file?.name,
+              sha: attachmentFileStorageUpdated.file?.sha,
+              storedPath: attachmentFileStorageUpdated.file?.path,
+              streamUrl: attachmentFileStorageUpdated.file?.url,
+              size: attachmentFileStorageUpdated.file?.size
+            });
 
-              keptIds.add(attachmentUpdated.fields.id!);
-              projectAttachmentOutput.push(attachmentUpdated.fields);
-            }
+            keptIds.add(attachmentUpdated.fields.id!);
+            projectAttachmentOutput.push(attachmentUpdated.fields);
           }
         }
 
