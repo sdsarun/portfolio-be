@@ -1,15 +1,22 @@
+import { type AttachmentAttributes } from "../../entities/attachment/attachment.entity";
 import { type CertificationAttributes } from "../../entities/certifications/certifications.entity";
 import { type ContactAttributes } from "../../entities/contact/contact.entity";
 import { type EducationAttributes } from "../../entities/education/education.entity";
 import { type ProfileAttributes } from "../../entities/profile/profile.entity";
 import { type ProjectExperienceAttributes } from "../../entities/project-experience/project-experience.entity";
+import { type ProjectLinkAttributes } from "../../entities/project-link/project-link.entity";
 import { type SkillAttributes } from "../../entities/skill/skill.entity";
 import { type WorkExperienceAttributes } from "../../entities/work-experience/work-experience.entity";
+
+type ProjectExperienceAggregate = ProjectExperienceAttributes & {
+  links: ProjectLinkAttributes[];
+  attachments: AttachmentAttributes[];
+};
 
 export type GetProfileOutput = {
   profile: ProfileAttributes | null;
   workExperiences: WorkExperienceAttributes[];
-  projectExperiences: ProjectExperienceAttributes[];
+  projectExperiences: ProjectExperienceAggregate[];
   skills: SkillAttributes[];
   education: EducationAttributes[];
   certification: CertificationAttributes[];

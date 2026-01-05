@@ -37,7 +37,7 @@ import { GetProfileInfoHandler } from "../../adapters/http/routes/profile/handle
 import { GetProfileResumeHandler } from "../../adapters/http/routes/profile/handlers/get-resume/get-profile-resume.handler";
 import { GetProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/get-work/get-profile-work.handler";
 import { GetProfileContactHandler } from "../../adapters/http/routes/profile/handlers/get-contact/get-profile-contact.handler";
-import { GithubFileStorageRepository } from "../github/github-file-storage.repository";
+import { GithubFileStorageRepository } from "../file-storage/github-file-storage.repository";
 import { logger } from "../logger/logger";
 
 export type ApplicationContext = {
@@ -72,6 +72,7 @@ export function createApplicationContext(): ApplicationContext {
     repoName: env.GITHUB_STORAGE_REPO_NAME,
     apiVersion: env.GITHUB_API_VERSION,
     directoryPath: env.GITHUB_STORAGE_DIRECTORY_PATH,
+    branch: env.GITHUB_STORAGE_BRANCH,
     log: {
       debug: logger.debug,
       error: logger.error,
@@ -118,7 +119,11 @@ export function createApplicationContext(): ApplicationContext {
   const upsertProfileResumeHandler = new UpsertProfileResumeHandler({
     upsertProfileResumeUseCase
   });
-  const upsertProfileWorkUseCase = new UpsertProfileWorkUseCase({ uow, authId: env.AUTH_ID });
+  const upsertProfileWorkUseCase = new UpsertProfileWorkUseCase({
+    uow,
+    fileStorageRepository: githubFileStorageRepository,
+    authId: env.AUTH_ID
+  });
   const upsertProfileWorkHandler = new UpsertProfileWorkHandler({
     upsertProfileWorkUseCase
   });

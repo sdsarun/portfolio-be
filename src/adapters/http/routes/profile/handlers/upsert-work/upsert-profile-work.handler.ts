@@ -1,16 +1,7 @@
-import {
-  type HttpContext,
-  type HttpHandler,
-  type HttpResponse
-} from "../../../../http-adapter.port";
 import { ValidationError } from "../../../../../../core/errors/validation.error";
-import {
-  type UpsertProfileWorkUseCasePort
-} from "../../../../../../core/usecases/upsert-profile-work/upsert-profile-work.usecase";
-import {
-  UpsertProfileWorkDTO,
-  upsertProfileWorkInputDTOSchema
-} from "./upsert-profile-work.dto";
+import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
+import { type UpsertProfileWorkUseCasePort } from "../../../../../../core/usecases/upsert-profile-work/upsert-profile-work.usecase";
+import { type UpsertProfileWorkDTO, upsertProfileWorkInputDTOSchema } from "./upsert-profile-work.dto";
 
 export type UpsertProfileWorkHandlerPort = HttpHandler<{ body: UpsertProfileWorkDTO }>;
 

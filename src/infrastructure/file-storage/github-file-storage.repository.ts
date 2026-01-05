@@ -14,6 +14,7 @@ export type GithubFileStorageOptions = Pick<OctokitOptions, "log"> & {
   repoName: string;
   directoryPath: string;
   apiVersion: string;
+  branch: string;
 };
 
 export class GithubFileStorageRepository implements FileStorageRepositoryPort {
@@ -21,12 +22,21 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
   private readonly repoName: string;
   private readonly directoryPath: string;
   private readonly apiVersion: string;
+  private readonly branch: string;
 
-  constructor({ token, repoName, directoryPath, apiVersion, ...options }: GithubFileStorageOptions) {
+  constructor({
+    token,
+    repoName,
+    directoryPath,
+    apiVersion,
+    branch,
+    ...options
+  }: GithubFileStorageOptions) {
     this.client = new Octokit({ auth: token, ...options });
     this.repoName = repoName;
     this.directoryPath = directoryPath;
     this.apiVersion = apiVersion;
+    this.branch = branch;
   }
 
   async getFile(input: GetRepositoryFileInput): Promise<GetRepositoryFileOutput> {
@@ -37,6 +47,7 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
         owner: userInfo.login,
         repo: this.repoName,
         path: this.joinPath(this.directoryPath, input.file.path),
+        ref: this.branch,
         headers: {
           "X-GitHub-Api-Version": this.apiVersion
         }
@@ -81,7 +92,8 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
         repo: this.repoName,
         path: this.joinPath(this.directoryPath, input.file.path),
         content: input.file.content,
-        message: `chore(portfolio): added file ${input.file.path}`,
+        branch: this.branch,
+        message: `chore(portfolio): ${input?.sha ? "replaced file" : "added file"} ${input.file.path}`,
         headers: {
           "X-GitHub-Api-Version": this.apiVersion
         },
@@ -120,6 +132,7 @@ export class GithubFileStorageRepository implements FileStorageRepositoryPort {
         owner: login,
         repo: this.repoName,
         path: this.joinPath(this.directoryPath, input.file.path),
+        branch: this.branch,
         message: `chore(portfolio): deleted file ${input.file.path}`,
         sha: input.sha,
         headers: {

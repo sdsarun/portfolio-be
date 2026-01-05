@@ -34,19 +34,6 @@ export type UpsertRepositoryFileInput = {
     content: string;
   };
   sha?: string; // for update existing
-  // NOTE: not need right now
-  // repository?: {
-  //   owner: string;
-  //   name: string;
-  // };
-  // commit?: {
-  //   message: string;
-  //   branch: string;
-  //   committer: {
-  //     name: string;
-  //     email: string;
-  //   };
-  // };
 };
 
 export type UpsertRepositoryFileOutput = FileStorageRepositoryOutput<{
@@ -64,19 +51,6 @@ export type DeleteRepositoryFileInput = {
     path: string;
   };
   sha: string;
-  // NOTE: not need right now
-  // repository: {
-  //   owner: string;
-  //   name: string;
-  // };
-  // commit: {
-  //   message: string;
-  //   branch: string;
-  //   committer: {
-  //     name: string;
-  //     email: string;
-  //   };
-  // };
 };
 
 export type DeleteRepositoryFileOutput = FileStorageRepositoryOutput<{

@@ -109,21 +109,21 @@ model Certification {
 }
 
 model ProjectExperience {
-  id           String        @id @default(uuid()) @db.Uuid
-  profileId    String?       @map("profile_id") @db.Uuid
-  title        String?       @db.Text
-  isInProgress Boolean?      @map("is_in_progress") @db.Boolean
-  startDate    DateTime?     @map("start_date") @db.Date
-  endDate      DateTime?     @map("end_date") @db.Date
-  imageUrl     String?       @map("image_url") @db.Text
-  description  String?       @db.Text
-  tags         String?       @db.Text
-  displayOrder Int?          @map("display_order") @db.Integer
-  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt    DateTime?     @map("deleted_at") @db.Timestamptz(6)
-  profile      Profile?      @relation(fields: [profileId], references: [id])
-  projectLinks ProjectLink[]
+  id                           String                        @id @default(uuid()) @db.Uuid
+  profileId                    String?                       @map("profile_id") @db.Uuid
+  title                        String?                       @db.Text
+  isInProgress                 Boolean?                      @map("is_in_progress") @db.Boolean
+  startDate                    DateTime?                     @map("start_date") @db.Date
+  endDate                      DateTime?                     @map("end_date") @db.Date
+  description                  String?                       @db.Text
+  tags                         String?                       @db.Text
+  displayOrder                 Int?                          @map("display_order") @db.Integer
+  createdAt                    DateTime                      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                    DateTime                      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                    DateTime?                     @map("deleted_at") @db.Timestamptz(6)
+  profile                      Profile?                      @relation(fields: [profileId], references: [id])
+  projectLinks                 ProjectLink[]
+  projectExperienceAttachments ProjectExperienceAttachment[]
 
   @@index([profileId])
   @@map("project_experience")
@@ -158,4 +158,38 @@ model Contact {
 
   @@index([profileId])
   @@map("contact")
+}
+
+model Attachment {
+  id                           String                        @id @default(uuid()) @db.Uuid
+  name                         String?                       @db.Text
+  storageType                  String?                       @map("storage_type") @db.Text
+  storageProvider              String?                       @map("storage_provider") @db.Text
+  size                         Int?                          @db.Integer
+  mime                         String?                       @db.Text
+  sha                          String?                       @db.Text
+  storedPath                   String?                       @map("stored_path") @db.Text
+  streamUrl                    String?                       @map("stream_url") @db.Text
+  createdAt                    DateTime                      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                    DateTime                      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                    DateTime?                     @map("deleted_at") @db.Timestamptz(6)
+  projectExperienceAttachments ProjectExperienceAttachment[]
+
+  @@map("attachments")
+}
+
+model ProjectExperienceAttachment {
+  id           String    @id @default(uuid()) @db.Uuid
+  projectId    String    @map("project_id") @db.Uuid
+  attachmentId String    @map("attachment_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  projectExperience ProjectExperience @relation(fields: [projectId], references: [id])
+  attachment        Attachment        @relation(fields: [attachmentId], references: [id])
+
+  @@index([projectId])
+  @@index([attachmentId])
+  @@map("project_experience_attachments")
 }

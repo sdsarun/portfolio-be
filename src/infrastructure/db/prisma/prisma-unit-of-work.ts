@@ -1,19 +1,23 @@
+import { type AttachmentRepository } from "../../../core/entities/attachment/attachment.repository";
 import { type AuthRepository } from "../../../core/entities/auth/auth.repository";
 import { type CertificationRepository } from "../../../core/entities/certifications/certification.repository";
 import { type ContactRepository } from "../../../core/entities/contact/contact.repository";
 import { type EducationRepository } from "../../../core/entities/education/education.repository";
 import { type ProfileRepository } from "../../../core/entities/profile/profile.repository";
+import { ProjectExperienceAttachmentRepository } from "../../../core/entities/project-experience-attachment/project-experience-attachment.repository";
 import { type ProjectExperienceRepository } from "../../../core/entities/project-experience/project-experience.repository";
 import { type ProjectLinkRepository } from "../../../core/entities/project-link/project-link.repository";
 import { type SkillRepository } from "../../../core/entities/skill/skill.repository";
 import { type WorkExperienceRepository } from "../../../core/entities/work-experience/work-experience.repository";
 import { type UnitOfWork, type TransactionalUnitOfWork } from "../../../core/ports/unit-of-work.port";
 import { type PrismaClientOrTransaction } from "./prisma-database-session";
+import { PrismaAttachmentRepository } from "./repositories/prisma-attachment.repository";
 import { PrismaAuthRepository } from "./repositories/prisma-auth.repository";
 import { PrismaCertificationRepository } from "./repositories/prisma-certification.repository";
 import { PrismaContactRepository } from "./repositories/prisma-contact.repository";
 import { PrismaEducationRepository } from "./repositories/prisma-education.repository";
 import { PrismaProfileRepository } from "./repositories/prisma-profile.repository";
+import { PrismaProjectExperienceAttachmentRepository } from "./repositories/prisma-project-experience-attachment.repository";
 import { PrismaProjectExperienceRepository } from "./repositories/prisma-project-experience.repository";
 import { PrismaProjectLinkRepository } from "./repositories/prisma-project-link.repository";
 import { PrismaSkillRepository } from "./repositories/prisma-skill.repository";
@@ -29,6 +33,8 @@ export class PrismaUnitOfWork implements UnitOfWork {
   public readonly projectExperience: ProjectExperienceRepository;
   public readonly projectLink: ProjectLinkRepository;
   public readonly contact: ContactRepository;
+  public readonly attachment: AttachmentRepository;
+  public readonly projectExperienceAttachment: ProjectExperienceAttachmentRepository;
 
   constructor(private readonly deps: { prisma: PrismaClientOrTransaction }) {
     const { prisma } = deps;
@@ -41,6 +47,8 @@ export class PrismaUnitOfWork implements UnitOfWork {
     this.projectExperience = new PrismaProjectExperienceRepository(prisma);
     this.projectLink = new PrismaProjectLinkRepository(prisma);
     this.contact = new PrismaContactRepository(prisma);
+    this.attachment = new PrismaAttachmentRepository(prisma);
+    this.projectExperienceAttachment = new PrismaProjectExperienceAttachmentRepository(prisma);
   }
 
   async runInTransaction<T>(handler: (uow: TransactionalUnitOfWork) => Promise<T>): Promise<T> {
