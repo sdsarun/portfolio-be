@@ -17,7 +17,6 @@ export class UpsertProfileResumeHandler implements UpsertProfileResumeHandlerPor
     const result = await this.deps.upsertProfileResumeUseCase.execute(parsed.data);
 
     return {
-      success: true,
       statusCode: 200,
       data: result
     };

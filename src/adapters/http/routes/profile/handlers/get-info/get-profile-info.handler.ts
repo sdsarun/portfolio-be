@@ -9,7 +9,6 @@ export class GetProfileInfoHandler implements HttpHandler {
   async handle(): Promise<HttpResponse> {
     const result = await this.deps.getProfileInfoUseCase.execute();
     return {
-      success: true,
       statusCode: 200,
       data: { profile: result.profile }
     };

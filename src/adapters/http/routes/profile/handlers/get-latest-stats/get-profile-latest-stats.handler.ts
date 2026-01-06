@@ -23,7 +23,6 @@ export class GetProfileLatestStatsHandler implements HttpHandler {
     const result = await this.deps.getProfileLatestUpdatedUseCase.execute({ groups });
 
     return {
-      success: true,
       statusCode: 200,
       data: result
     };

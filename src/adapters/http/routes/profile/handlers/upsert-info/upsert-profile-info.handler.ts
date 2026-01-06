@@ -1,16 +1,7 @@
-import {
-  type HttpContext,
-  type HttpHandler,
-  type HttpResponse
-} from "../../../../http-adapter.port";
+import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
 import { ValidationError } from "../../../../../../core/errors/validation.error";
-import {
-  type UpsertProfileInfoUseCasePort
-} from "../../../../../../core/usecases/upsert-profile-info/upsert-profile-info.usecase";
-import {
-  UpsertProfileInfoDTO,
-  upsertProfileInfoInputDTOSchema
-} from "./upsert-profile-info.dto";
+import { type UpsertProfileInfoUseCasePort } from "../../../../../../core/usecases/upsert-profile-info/upsert-profile-info.usecase";
+import { UpsertProfileInfoDTO, upsertProfileInfoInputDTOSchema } from "./upsert-profile-info.dto";
 
 export type UpsertProfileInfoHandlerPort = HttpHandler<{ body: UpsertProfileInfoDTO }>;
 
@@ -26,7 +17,6 @@ export class UpsertProfileInfoHandler implements UpsertProfileInfoHandlerPort {
     const result = await this.deps.upsertProfileInfoUseCase.execute(parsed.data);
 
     return {
-      success: true,
       statusCode: 200,
       data: result
     };
