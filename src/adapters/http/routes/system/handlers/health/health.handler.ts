@@ -22,7 +22,6 @@ export class HealthHandler implements HttpHandler {
     ]);
 
     return {
-      success: true,
       data: {
         ts: Date.now(),
         services: {

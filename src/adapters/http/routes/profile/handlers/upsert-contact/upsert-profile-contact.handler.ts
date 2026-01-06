@@ -1,12 +1,6 @@
-import {
-  type HttpContext,
-  type HttpHandler,
-  type HttpResponse
-} from "../../../../http-adapter.port";
+import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
 import { ValidationError } from "../../../../../../core/errors/validation.error";
-import {
-  type UpsertProfileContactUseCasePort
-} from "../../../../../../core/usecases/upsert-profile-contact/upsert-profile-contact.usecase";
+import { type UpsertProfileContactUseCasePort } from "../../../../../../core/usecases/upsert-profile-contact/upsert-profile-contact.usecase";
 import {
   UpsertProfileContactDTO,
   upsertProfileContactInputDTOSchema
@@ -15,9 +9,7 @@ import {
 export type UpsertProfileContactHandlerPort = HttpHandler<{ body: UpsertProfileContactDTO }>;
 
 export class UpsertProfileContactHandler implements UpsertProfileContactHandlerPort {
-  constructor(
-    private readonly deps: { upsertProfileContactUseCase: UpsertProfileContactUseCasePort }
-  ) {}
+  constructor(private readonly deps: { upsertProfileContactUseCase: UpsertProfileContactUseCasePort }) {}
 
   async handle({ request }: HttpContext<{ body: UpsertProfileContactDTO }>): Promise<HttpResponse> {
     const parsed = await upsertProfileContactInputDTOSchema.safeParseAsync(request.body);
@@ -28,7 +20,6 @@ export class UpsertProfileContactHandler implements UpsertProfileContactHandlerP
     const result = await this.deps.upsertProfileContactUseCase.execute(parsed.data);
 
     return {
-      success: true,
       statusCode: 200,
       data: result
     };

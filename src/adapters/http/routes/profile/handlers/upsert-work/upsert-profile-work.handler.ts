@@ -17,7 +17,6 @@ export class UpsertProfileWorkHandler implements UpsertProfileWorkHandlerPort {
     const result = await this.deps.upsertProfileWorkUseCase.execute(parsed.data);
 
     return {
-      success: true,
       statusCode: 200,
       data: result
     };

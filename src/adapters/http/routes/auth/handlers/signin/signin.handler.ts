@@ -16,7 +16,6 @@ export class SignInHandler implements HttpHandler {
 
     const result = await this.deps.signInUseCase.execute(parsed.data);
     return {
-      success: true,
       statusCode: 201,
       data: result
     };

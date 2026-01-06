@@ -9,7 +9,6 @@ export class GetProfileContactHandler implements HttpHandler {
   async handle(): Promise<HttpResponse> {
     const result = await this.deps.getProfileContactUseCase.execute();
     return {
-      success: true,
       statusCode: 200,
       data: { contacts: result.contacts }
     };

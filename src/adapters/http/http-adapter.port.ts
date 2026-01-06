@@ -21,9 +21,7 @@ export type HttpRequest<T extends HttpRequestInput = HttpRequestInput> = {
   };
 };
 
-export type HttpResponse =
-  | { success: true; statusCode: number; data: any }
-  | { success: false; statusCode: number; error: any };
+export type HttpResponse = { statusCode: number; data: any };
 
 export type HttpContext<T extends HttpRequestInput = HttpRequestInput, S = Record<string, any>> = {
   request: HttpRequest<T>;
@@ -83,10 +81,7 @@ export async function executeHttpRoute(
 
   try {
     const result = await runPipeline({ handler: route.handler, middlewares: route.middlewares }, ctx);
-    if (result.success) {
-      return reply.success({ statusCode: result.statusCode, data: result.data });
-    }
-    return reply.error({ statusCode: result.statusCode, error: result.error });
+    return reply.success({ statusCode: result.statusCode, data: result.data });
   } catch (error) {
     let problemDetails: ProblemDetail;
 

@@ -15,6 +15,6 @@ export class UpdatePasswordHandler implements UpdatePasswordHandlerPort {
     }
 
     const result = await this.deps.updatePasswordUseCase.execute(parsed.data);
-    return { success: true, statusCode: 200, data: result };
+    return { statusCode: 200, data: result };
   }
 }
