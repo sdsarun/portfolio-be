@@ -21,3 +21,14 @@ export class ProfileNotFoundError extends ProfileError {
     });
   }
 }
+
+export class UpsertProfileWorkError extends ProfileError {
+  constructor(detail?: string) {
+    super({
+      title: "Upsert profile work failed",
+      status: 500,
+      detail: detail ?? "An unexpected error occurred while updating profile work.",
+      code: "UPSERT_PROFILE_WORK_FAILED"
+    });
+  }
+}

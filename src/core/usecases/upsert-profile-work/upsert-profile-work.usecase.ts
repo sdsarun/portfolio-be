@@ -5,6 +5,9 @@ import { type UpsertProfileWorkOutput } from "./upsert-profile-work.output";
 import { type ProjectExperience } from "../../entities/project-experience/project-experience.entity";
 import { type FileStorageRepositoryPort } from "../../ports/file-storage-repository.port";
 import { type ProjectLink } from "../../entities/project-link/project-link.entity";
+import { AttachmentDeleteError, AttachmentUploadError } from "../../errors/attachment.errors";
+import { UpsertProfileWorkError } from "../../errors/profile.error";
+import { BaseError } from "../../errors/base.error";
 
 export type UpsertProfileWorkUseCasePort = UseCase<UpsertProfileWorkInput, UpsertProfileWorkOutput>;
 
@@ -142,7 +145,11 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
                 keptIds.add(attachmentCreated.fields.id!);
                 projectAttachmentOutput.push(attachmentCreated.fields);
               } catch (error) {
-                // TODO: add throw error usecase
+                // TODO: add logger
+                throw new AttachmentUploadError(
+                  attachmentInputItem?.name!,
+                  "Failed to create new attachment in storage."
+                );
               }
             } else {
               // Case 2: reference existing
@@ -178,7 +185,11 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
                 keptIds.add(attachmentUpdated.fields.id!);
                 projectAttachmentOutput.push(attachmentUpdated.fields);
               } catch (error) {
-                // TODO: add throw error usecase
+                // TODO: add logger
+                throw new AttachmentUploadError(
+                  existingAttachment.fields.name!,
+                  "Failed to update existing attachment in storage."
+                );
               }
             }
           }
@@ -213,7 +224,8 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
             )
           );
         } catch (error) {
-          // TODO: add throw error usecase
+          // TODO: add logger
+          throw new AttachmentDeleteError("One or more attachments could not be deleted from storage.");
         }
 
         await Promise.all([
@@ -227,8 +239,11 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
           projectExperiences: projectExperiencesSaved
         };
       } catch (error) {
-        // TODO: add throw error usecase
-        throw error;
+        // TODO: add logger
+        if (error instanceof BaseError) {
+          throw error;
+        }
+        throw new UpsertProfileWorkError(error instanceof Error ? error.message : undefined);
       }
     });
   }
