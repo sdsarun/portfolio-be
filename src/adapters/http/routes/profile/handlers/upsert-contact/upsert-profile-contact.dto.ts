@@ -9,8 +9,8 @@ const contactSchema = z.object({
   displayOrder: z.number().int().positive().optional().nullable()
 });
 
-export const upsertProfileContactInputDTOSchema = z.object({
+export const upsertProfileContactBodyDTOSchema = z.object({
   contacts: z.array(contactSchema).optional()
 });
 
-export type UpsertProfileContactDTO = z.infer<typeof upsertProfileContactInputDTOSchema>;
+export type UpsertProfileContactBodyDTO = z.infer<typeof upsertProfileContactBodyDTOSchema>;

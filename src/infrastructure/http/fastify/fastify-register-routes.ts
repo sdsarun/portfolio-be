@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { type FastifyInstance, type FastifyRequest } from "fastify";
 import {
   executeHttpRoute,
   type HttpRequest,
@@ -21,7 +21,8 @@ function toHttpRequest(request: FastifyRequest): HttpRequest {
     query: request.query,
     requestMeta: {
       path: request.url,
-      ip
+      ip,
+      reqId: request.id
     }
   };
 }

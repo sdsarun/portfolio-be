@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const upsertProfileWorkInputDTOSchema = z.object({
+export const upsertProfileWorkBodyDTOSchema = z.object({
   projectExperiences: z.array(
     z.object({
       id: z.uuidv4().nullish(),
@@ -79,4 +79,4 @@ export const upsertProfileWorkInputDTOSchema = z.object({
   )
 });
 
-export type UpsertProfileWorkDTO = z.infer<typeof upsertProfileWorkInputDTOSchema>;
+export type UpsertProfileWorkBodyDTO = z.infer<typeof upsertProfileWorkBodyDTOSchema>;

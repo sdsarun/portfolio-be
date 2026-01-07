@@ -49,7 +49,7 @@ export type DeleteRepositoryFileOutput = {
   };
 };
 
-export type FileStorageRepositoryPort = {
+export type FileStorageRepository = {
   getFile(input: GetRepositoryFileInput): Promise<GetRepositoryFileOutput>;
   upsertFile(input: UpsertRepositoryFileInput): Promise<UpsertRepositoryFileOutput>;
   deleteFile(input: DeleteRepositoryFileInput): Promise<DeleteRepositoryFileOutput>;

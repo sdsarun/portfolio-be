@@ -1,3 +1,4 @@
+import { ApiKeyRepository } from "../../../core/entities/api-key/api-key.repository";
 import { type AttachmentRepository } from "../../../core/entities/attachment/attachment.repository";
 import { type AuthRepository } from "../../../core/entities/auth/auth.repository";
 import { type CertificationRepository } from "../../../core/entities/certifications/certification.repository";
@@ -11,6 +12,7 @@ import { type SkillRepository } from "../../../core/entities/skill/skill.reposit
 import { type WorkExperienceRepository } from "../../../core/entities/work-experience/work-experience.repository";
 import { type UnitOfWork, type TransactionalUnitOfWork } from "../../../core/ports/unit-of-work.port";
 import { type PrismaClientOrTransaction } from "./prisma-database-session";
+import { PrismaApiKeyRepository } from "./repositories/prisma-api-key.repository";
 import { PrismaAttachmentRepository } from "./repositories/prisma-attachment.repository";
 import { PrismaAuthRepository } from "./repositories/prisma-auth.repository";
 import { PrismaCertificationRepository } from "./repositories/prisma-certification.repository";
@@ -35,6 +37,7 @@ export class PrismaUnitOfWork implements UnitOfWork {
   public readonly contact: ContactRepository;
   public readonly attachment: AttachmentRepository;
   public readonly projectExperienceAttachment: ProjectExperienceAttachmentRepository;
+  public readonly apiKey: ApiKeyRepository;
 
   constructor(private readonly deps: { prisma: PrismaClientOrTransaction }) {
     const { prisma } = deps;
@@ -49,6 +52,7 @@ export class PrismaUnitOfWork implements UnitOfWork {
     this.contact = new PrismaContactRepository(prisma);
     this.attachment = new PrismaAttachmentRepository(prisma);
     this.projectExperienceAttachment = new PrismaProjectExperienceAttachmentRepository(prisma);
+    this.apiKey = new PrismaApiKeyRepository(prisma);
   }
 
   async runInTransaction<T>(handler: (uow: TransactionalUnitOfWork) => Promise<T>): Promise<T> {

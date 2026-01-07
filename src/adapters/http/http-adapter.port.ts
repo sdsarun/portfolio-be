@@ -9,31 +9,35 @@ export type HttpRequestInput = {
   cookies?: any;
 };
 
-export type HttpRequest<T extends HttpRequestInput = HttpRequestInput> = {
-  body?: T["body"];
-  query?: T["query"];
-  params?: T["params"];
-  headers?: T["headers"];
-  cookies?: T["cookies"];
+export type HttpRequest<TRequestInput extends HttpRequestInput = HttpRequestInput> = {
+  body?: TRequestInput["body"];
+  query?: TRequestInput["query"];
+  params?: TRequestInput["params"];
+  headers?: TRequestInput["headers"];
+  cookies?: TRequestInput["cookies"];
   requestMeta: {
     path: string;
     ip: string;
+    reqId: string;
   };
 };
 
-export type HttpResponse = { statusCode: number; data: any };
+export type HttpResponse<TData = any> = { statusCode: number; data?: TData };
 
-export type HttpContext<T extends HttpRequestInput = HttpRequestInput, S = Record<string, any>> = {
-  request: HttpRequest<T>;
-  state: S;
+export type HttpContext<
+  TRequest extends HttpRequestInput = HttpRequestInput,
+  TState = Record<string, any>
+> = {
+  request: HttpRequest<TRequest>;
+  state: TState;
 };
 
-export type HttpMiddleware<T extends HttpRequestInput = HttpRequestInput> = {
-  handle(ctx: HttpContext<T>): Promise<void> | void;
+export type HttpMiddleware<TContext extends HttpRequestInput = HttpRequestInput> = {
+  handle(ctx: HttpContext<TContext>): Promise<void> | void;
 };
 
-export type HttpHandler<T extends HttpRequestInput = HttpRequestInput> = {
-  handle(ctx: HttpContext<T>): Promise<HttpResponse>;
+export type HttpHandler<TContext extends HttpRequestInput = HttpRequestInput, TResponse = any> = {
+  handle(ctx: HttpContext<TContext>): Promise<HttpResponse<TResponse>>;
 };
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -81,7 +85,16 @@ export async function executeHttpRoute(
 
   try {
     const result = await runPipeline({ handler: route.handler, middlewares: route.middlewares }, ctx);
-    return reply.success({ statusCode: result.statusCode, data: result.data });
+
+    const response: HttpResponse = {
+      statusCode: result.statusCode
+    };
+
+    if (result?.data) {
+      response.data = result.data;
+    }
+
+    return reply.success(response);
   } catch (error) {
     let problemDetails: ProblemDetail;
 
@@ -92,6 +105,7 @@ export async function executeHttpRoute(
     }
 
     problemDetails.instance = request.requestMeta.path;
+    problemDetails.refId = request.requestMeta.reqId;
 
     return reply.error({
       statusCode: problemDetails.status,

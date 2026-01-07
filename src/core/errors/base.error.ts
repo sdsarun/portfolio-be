@@ -5,6 +5,7 @@ export type ProblemDetail = {
   detail?: string;
   instance?: string;
   code?: string;
+  refId?: string;
 };
 
 export type BaseErrorOptions = Partial<ProblemDetail>;
@@ -17,6 +18,7 @@ export class BaseError extends Error {
   public readonly instance?: string;
   public readonly code?: string;
   public readonly rawError?: unknown;
+  public readonly refId?: string;
 
   constructor(options?: BaseErrorOptions) {
     super(options?.detail ?? options?.title ?? "Unexpected error");
@@ -27,6 +29,7 @@ export class BaseError extends Error {
     this.detail = options?.detail;
     this.instance = options?.instance;
     this.code = options?.code;
+    this.refId = options?.refId;
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, new.target);
@@ -50,6 +53,10 @@ export class BaseError extends Error {
 
     if (this.code) {
       problem.code = this.code;
+    }
+
+    if (this.refId) {
+      problem.refId = this.refId;
     }
 
     return problem;

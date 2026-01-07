@@ -3,7 +3,7 @@ import { type UseCase } from "../base/base.usecase";
 import { type UpsertProfileWorkInput } from "./upsert-profile-work.input";
 import { type UpsertProfileWorkOutput } from "./upsert-profile-work.output";
 import { type ProjectExperience } from "../../entities/project-experience/project-experience.entity";
-import { type FileStorageRepositoryPort } from "../../ports/file-storage-repository.port";
+import { type FileStorageRepository } from "../../ports/file-storage-repository.port";
 import { type ProjectLink } from "../../entities/project-link/project-link.entity";
 import { AttachmentDeleteError, AttachmentUploadError } from "../../errors/attachment.errors";
 import { UpsertProfileWorkError } from "../../errors/profile.error";
@@ -15,7 +15,7 @@ export class UpsertProfileWorkUseCase implements UpsertProfileWorkUseCasePort {
   constructor(
     private readonly deps: {
       uow: UnitOfWork;
-      fileStorageRepository: FileStorageRepositoryPort;
+      fileStorageRepository: FileStorageRepository;
       authId: string;
     }
   ) {}
