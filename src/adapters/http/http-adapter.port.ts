@@ -22,7 +22,7 @@ export type HttpRequest<TRequestInput extends HttpRequestInput = HttpRequestInpu
   };
 };
 
-export type HttpResponse<TData = any> = { statusCode: number; data: TData };
+export type HttpResponse<TData = any> = { statusCode: number; data?: TData };
 
 export type HttpContext<
   TRequest extends HttpRequestInput = HttpRequestInput,
@@ -85,7 +85,16 @@ export async function executeHttpRoute(
 
   try {
     const result = await runPipeline({ handler: route.handler, middlewares: route.middlewares }, ctx);
-    return reply.success({ statusCode: result.statusCode, data: result.data });
+
+    const response: HttpResponse = {
+      statusCode: result.statusCode
+    };
+
+    if (result?.data) {
+      response.data = result.data;
+    }
+
+    return reply.success(response);
   } catch (error) {
     let problemDetails: ProblemDetail;
 
