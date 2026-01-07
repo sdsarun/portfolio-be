@@ -29,7 +29,7 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
     return record ? this.toEntity(record) : null;
   }
 
-  async revokedByIds(id: string[]): Promise<void> {
+  async revokeByIds(id: string[]): Promise<void> {
     await this.prisma.apiKey.updateMany({
       data: { revokedAt: new Date() },
       where: { id: { in: id } }
