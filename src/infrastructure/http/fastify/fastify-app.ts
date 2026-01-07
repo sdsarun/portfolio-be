@@ -6,9 +6,23 @@ import { createApplicationContext } from "../../ioc/create-application-context";
 import { fastifyRegisterRoutes } from "./fastify-register-routes";
 import { type HttpAppliaction } from "../http.port";
 import { getCorsConfig } from "../cors.config";
+import { randomUUID } from "crypto";
 
 export function createFastifyApp(): HttpAppliaction {
-  const server = fastify({ loggerInstance: logger });
+  const server = fastify({
+    loggerInstance: logger,
+    genReqId: (req) => {
+      const requestId = req.headers["x-request-id"];
+      if (typeof requestId === "string" && requestId.length > 0) {
+        return requestId;
+      }
+      const correlationId = req.headers["x-correlation-id"];
+      if (typeof correlationId === "string" && correlationId.length > 0) {
+        return correlationId;
+      }
+      return randomUUID();
+    }
+  });
   server.register(fastifyCookie);
   server.register(fastifyCors, getCorsConfig());
 

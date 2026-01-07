@@ -18,6 +18,7 @@ export type HttpRequest<T extends HttpRequestInput = HttpRequestInput> = {
   requestMeta: {
     path: string;
     ip: string;
+    reqId: string;
   };
 };
 
@@ -92,6 +93,7 @@ export async function executeHttpRoute(
     }
 
     problemDetails.instance = request.requestMeta.path;
+    problemDetails.refId = request.requestMeta.reqId;
 
     return reply.error({
       statusCode: problemDetails.status,

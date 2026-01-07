@@ -21,7 +21,8 @@ function toHttpRequest(request: FastifyRequest): HttpRequest {
     query: request.query,
     requestMeta: {
       path: request.url,
-      ip
+      ip,
+      reqId: request.id
     }
   };
 }
