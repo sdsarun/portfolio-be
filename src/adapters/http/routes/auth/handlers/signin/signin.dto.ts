@@ -1,7 +1,7 @@
 import z from "zod";
 
-export const signInInputDTOSchema = z.object({
+export const signInBodyDTOSchema = z.object({
   password: z.string().min(1, "Password is required")
 });
 
-export type SignInInputDTO = z.infer<typeof signInInputDTOSchema>;
+export type SignInBodyDTO = z.infer<typeof signInBodyDTOSchema>;

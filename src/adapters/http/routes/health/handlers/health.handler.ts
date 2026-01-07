@@ -3,7 +3,7 @@ import { type HttpHandler, type HttpResponse } from "../../../http-adapter.port"
 
 export type HealthHandlerPort = HttpHandler;
 
-export class HealthHandler implements HttpHandler {
+export class HealthHandler implements HealthHandlerPort {
   constructor(
     private readonly deps: {
       dbCheck: HealthCheck;

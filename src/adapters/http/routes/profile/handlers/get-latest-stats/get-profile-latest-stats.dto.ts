@@ -2,7 +2,7 @@ import z from "zod";
 
 const groupsEnum = z.enum(["info", "resume", "work", "contact", "all"]);
 
-export const getProfileLatestStatsQuerySchema = z.object({
+export const getProfileLatestStatusQueryDTOSchema = z.object({
   group: z
     .preprocess((val) => {
       if (val === undefined) return undefined;
@@ -11,4 +11,4 @@ export const getProfileLatestStatsQuerySchema = z.object({
     .optional()
 });
 
-export type GetProfileLatestStatsQuery = z.infer<typeof getProfileLatestStatsQuerySchema>;
+export type GetProfileLatestStatusQueryDTO = z.infer<typeof getProfileLatestStatusQueryDTOSchema>;

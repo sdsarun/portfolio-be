@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const upsertProfileResumeInputDTOSchema = z.object({
+export const upsertProfileResumeBodyDTOSchema = z.object({
   resumeUrl: z.union([z.url({ message: "Resume URL must be a valid URL" }), z.null()]).optional(),
   workExperiences: z
     .array(
@@ -66,4 +66,4 @@ export const upsertProfileResumeInputDTOSchema = z.object({
     .optional()
 });
 
-export type UpsertProfileResumeDTO = z.infer<typeof upsertProfileResumeInputDTOSchema>;
+export type UpsertProfileResumeBodyDTO = z.infer<typeof upsertProfileResumeBodyDTOSchema>;

@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const updatePasswordInputDTOSchema = z
+export const updatePasswordBodyDTOSchema = z
   .object({
     oldPassword: z.string().min(1, "Old password is required"),
     newPassword: z.string().min(1, "New password is required")
@@ -15,4 +15,4 @@ export const updatePasswordInputDTOSchema = z
     }
   });
 
-export type UpdatePasswordDTO = z.infer<typeof updatePasswordInputDTOSchema>;
+export type UpdatePasswordBodyDTO = z.infer<typeof updatePasswordBodyDTOSchema>;

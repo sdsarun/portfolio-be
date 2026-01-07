@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const getApiKeysInputDTOSchema = z.object({
+export const getApiKeysQueryDTOSchema = z.object({
   offset: z.coerce
     .number("offset must be an integer")
     .min(0, "offset must be greater than or equal to 0"),
@@ -10,4 +10,4 @@ export const getApiKeysInputDTOSchema = z.object({
     .max(100, "limit must be less than or equal to 100")
 });
 
-export type GetApiKeysDTO = z.infer<typeof getApiKeysInputDTOSchema>;
+export type GetApiKeysQueryDTO = z.infer<typeof getApiKeysQueryDTOSchema>;

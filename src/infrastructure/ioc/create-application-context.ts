@@ -26,7 +26,6 @@ import { UpsertProfileResumeHandler } from "../../adapters/http/routes/profile/h
 import { UpsertProfileWorkHandler } from "../../adapters/http/routes/profile/handlers/upsert-work/upsert-profile-work.handler";
 import { UpsertProfileContactHandler } from "../../adapters/http/routes/profile/handlers/upsert-contact/upsert-profile-contact.handler";
 import { GetProfileLatestUpdatedUseCase } from "../../core/usecases/profile-stats/get-profile-latest-updated.usecase";
-import { GetProfileLatestStatsHandler } from "../../adapters/http/routes/profile/handlers/get-latest-stats/get-profile-latest-stats.handler";
 import { GetProfileInfoUseCase } from "../../core/usecases/get-profile-info/get-profile-info.usecase";
 import { GetProfileResumeUseCase } from "../../core/usecases/get-profile-resume/get-profile-resume.usecase";
 import { GetProfileWorkUseCase } from "../../core/usecases/get-profile-work/get-profile-work.usecase";
@@ -50,6 +49,7 @@ import { DeleteApiKeyByIdUseCase } from "../../core/usecases/delete-api-key-by-i
 import { DeleteApiKeyByIdHandler } from "../../adapters/http/routes/api-keys/handlers/delete-api-key-by-id/delete-api-key-by-id.handler";
 import { RevokeApiKeysHandler } from "../../adapters/http/routes/api-keys/handlers/revoke-api-keys/revoke-api-keys.handler";
 import { RevokeApiKeysUseCase } from "../../core/usecases/revoke-api-keys/revoke-api-keys.usecase";
+import { GetProfileLatestStatusHandler } from "../../adapters/http/routes/profile/handlers/get-latest-stats/get-profile-latest-stats.handler";
 
 export type ApplicationContext = {
   external: {
@@ -100,12 +100,14 @@ export function createApplicationContext(): ApplicationContext {
   // /auth
   const signInUseCase = new SignInUseCase({ uow, passwordHasher, tokenCryptor });
   const signInHandler = new SignInHandler({ signInUseCase });
+
   const updatePasswordUseCase = new UpdatePasswordUseCase({
     uow,
     passwordHasher,
     authId: env.AUTH_ID
   });
   const updatePasswordHandler = new UpdatePasswordHandler({ updatePasswordUseCase });
+
   const authRoutes = new AuthRoutes({
     requiredTokenMiddleware,
     signInHandler,
@@ -115,16 +117,22 @@ export function createApplicationContext(): ApplicationContext {
   // /profile
   const getProfileUseCase = new GetProfileUseCase({ uow, authId: env.AUTH_ID });
   const getProfileHandler = new GetProfileHandler({ getProfileUseCase });
+
   const getProfileInfoUseCase = new GetProfileInfoUseCase({ uow, authId: env.AUTH_ID });
   const getProfileInfoHandler = new GetProfileInfoHandler({ getProfileInfoUseCase });
+
   const getProfileResumeUseCase = new GetProfileResumeUseCase({ uow, authId: env.AUTH_ID });
   const getProfileResumeHandler = new GetProfileResumeHandler({ getProfileResumeUseCase });
+
   const getProfileWorkUseCase = new GetProfileWorkUseCase({ uow, authId: env.AUTH_ID });
   const getProfileWorkHandler = new GetProfileWorkHandler({ getProfileWorkUseCase });
+
   const getProfileContactUseCase = new GetProfileContactUseCase({ uow, authId: env.AUTH_ID });
   const getProfileContactHandler = new GetProfileContactHandler({ getProfileContactUseCase });
+
   const upsertProfileInfoUseCase = new UpsertProfileInfoUseCase({ uow, authId: env.AUTH_ID });
   const upsertProfileInfoHandler = new UpsertProfileInfoHandler({ upsertProfileInfoUseCase });
+
   const upsertProfileResumeUseCase = new UpsertProfileResumeUseCase({
     uow,
     authId: env.AUTH_ID
@@ -132,25 +140,30 @@ export function createApplicationContext(): ApplicationContext {
   const upsertProfileResumeHandler = new UpsertProfileResumeHandler({
     upsertProfileResumeUseCase
   });
+
   const upsertProfileWorkUseCase = new UpsertProfileWorkUseCase({
     uow,
     fileStorageRepository: githubFileStorageRepository,
     authId: env.AUTH_ID
   });
+
   const upsertProfileWorkHandler = new UpsertProfileWorkHandler({
     upsertProfileWorkUseCase
   });
+
   const upsertProfileContactUseCase = new UpsertProfileContactUseCase({ uow, authId: env.AUTH_ID });
   const upsertProfileContactHandler = new UpsertProfileContactHandler({
     upsertProfileContactUseCase
   });
+
   const getProfileLatestUpdatedUseCase = new GetProfileLatestUpdatedUseCase({
     uow,
     authId: env.AUTH_ID
   });
-  const getProfileLatestStatsHandler = new GetProfileLatestStatsHandler({
+  const getProfileLatestStatusHandler = new GetProfileLatestStatusHandler({
     getProfileLatestUpdatedUseCase
   });
+
   const profileRoutes = new ProfileRoutes({
     requiredTokenMiddleware,
     getProfileHandler,
@@ -158,11 +171,11 @@ export function createApplicationContext(): ApplicationContext {
     getProfileResumeHandler,
     getProfileWorkHandler,
     getProfileContactHandler,
+    getProfileLatestStatusHandler,
     upsertProfileInfoHandler,
     upsertProfileResumeHandler,
     upsertProfileWorkHandler,
-    upsertProfileContactHandler,
-    getProfileLatestStatsHandler
+    upsertProfileContactHandler
   });
 
   // /health

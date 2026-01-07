@@ -1,9 +1,8 @@
 import z from "zod";
 
-const optionalString = (message: string) =>
-  z.union([z.string().min(1, message), z.null()]).optional();
+const optionalString = (message: string) => z.union([z.string().min(1, message), z.null()]).optional();
 
-export const upsertProfileInfoInputDTOSchema = z.object({
+export const upsertProfileInfoBodyDTOSchema = z.object({
   displayName: optionalString("Display name is required"),
   roleName: optionalString("Role name is required"),
   bioTitle: optionalString("Bio title is required"),
@@ -11,4 +10,4 @@ export const upsertProfileInfoInputDTOSchema = z.object({
   siteUrl: z.union([z.url({ message: "Site URL must be a valid URL" }), z.null()]).optional()
 });
 
-export type UpsertProfileInfoDTO = z.infer<typeof upsertProfileInfoInputDTOSchema>;
+export type UpsertProfileInfoBodyDTO = z.infer<typeof upsertProfileInfoBodyDTOSchema>;
