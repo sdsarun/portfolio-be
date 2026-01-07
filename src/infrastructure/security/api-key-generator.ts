@@ -11,8 +11,12 @@ export class DefaultApiKeyGenerator implements ApiKeyGenerator {
   constructor(private readonly hasher: Hasher) {}
 
   async generate(): Promise<ApiKeyGeneratorOutput> {
-    const plaintext = this.defaultPrefix + randomBytes(32).toString("hex");
+    const prefix = this.defaultPrefix + randomBytes(4).toString("hex");
+    const secret = randomBytes(28).toString("hex");
+
+    const plaintext = prefix + secret;
     const hashed = await this.hasher.hash(plaintext);
-    return { plaintext, hashed };
+
+    return { plaintext, hashed, keyRef: prefix };
   }
 }

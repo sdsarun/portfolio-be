@@ -19,10 +19,11 @@ export class CreateApiKeyUseCase implements CreateApiKeyUseCasePort {
   async execute(input: CreateApiKeyInput): Promise<CreateApiKeyOutput> {
     return this.deps.uow.runInTransaction(async (uow) => {
       try {
-        const { plaintext, hashed } = await this.deps.apiKeyGenerator.generate();
+        const { plaintext, hashed, keyRef } = await this.deps.apiKeyGenerator.generate();
         await uow.apiKey.create({
           name: input.name,
           hashedKey: hashed,
+          keyRef,
           scope: Scope.GOD
         });
         return {
