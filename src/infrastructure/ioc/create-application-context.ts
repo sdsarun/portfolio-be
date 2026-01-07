@@ -48,6 +48,8 @@ import { GetApiKeysUseCase } from "../../core/usecases/get-api-keys/get-api-keys
 import { GetApiKeysHandler } from "../../adapters/http/routes/api-keys/handlers/get-api-keys/get-api-keys.handler";
 import { DeleteApiKeyByIdUseCase } from "../../core/usecases/delete-api-key-by-id/delete-api-key-by-id.usecase";
 import { DeleteApiKeyByIdHandler } from "../../adapters/http/routes/api-keys/handlers/delete-api-key-by-id/delete-api-key-by-id.handler";
+import { RevokeApiKeysHandler } from "../../adapters/http/routes/api-keys/handlers/revoke-api-keys/revoke-api-keys.handler";
+import { RevokeApiKeysUseCase } from "../../core/usecases/revoke-api-keys/revoke-api-keys.usecase";
 
 export type ApplicationContext = {
   external: {
@@ -181,11 +183,15 @@ export function createApplicationContext(): ApplicationContext {
   const deleteApiKeyByIdUseCase = new DeleteApiKeyByIdUseCase({ uow });
   const deleteApiKeyByIdHandler = new DeleteApiKeyByIdHandler({ deleteApiKeyByIdUseCase });
 
+  const revokeApiKeysUseCase = new RevokeApiKeysUseCase({ uow });
+  const revokeApiKeysHandler = new RevokeApiKeysHandler({ revokeApiKeysUseCase });
+
   const apiKeysRoutes = new ApiKeysRoutes({
     requiredTokenMiddleware,
     getApiKeysHandler,
     createApiKeyHandler,
-    deleteApiKeyByIdHandler
+    deleteApiKeyByIdHandler,
+    revokeApiKeysHandler
   });
 
   return {

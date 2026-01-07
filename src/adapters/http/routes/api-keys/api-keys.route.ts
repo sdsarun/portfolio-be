@@ -2,6 +2,7 @@ import { type HttpMiddleware, type HttpRoute, type HttpRouteDefinition } from ".
 import { type CreateApiKeyHandlerPort } from "./handlers/create-api-key/create-api-key.handler";
 import { type DeleteApiKeyByIdHandlerPort } from "./handlers/delete-api-key-by-id/delete-api-key-by-id.handler";
 import { type GetApiKeysHandlerPort } from "./handlers/get-api-keys/get-api-keys.handler";
+import { type RevokeApiKeysHandlerPort } from "./handlers/revoke-api-keys/revoke-api-keys.handler";
 
 export class ApiKeysRoutes implements HttpRouteDefinition {
   constructor(
@@ -10,6 +11,7 @@ export class ApiKeysRoutes implements HttpRouteDefinition {
       getApiKeysHandler: GetApiKeysHandlerPort;
       createApiKeyHandler: CreateApiKeyHandlerPort;
       deleteApiKeyByIdHandler: DeleteApiKeyByIdHandlerPort;
+      revokeApiKeysHandler: RevokeApiKeysHandlerPort;
     }
   ) {}
 
@@ -21,6 +23,13 @@ export class ApiKeysRoutes implements HttpRouteDefinition {
         version: 1,
         middlewares: [this.deps.requiredTokenMiddleware],
         handler: this.deps.createApiKeyHandler
+      },
+      {
+        method: "POST",
+        path: "/api-keys/revoke",
+        version: 1,
+        middlewares: [this.deps.requiredTokenMiddleware],
+        handler: this.deps.revokeApiKeysHandler
       },
       {
         method: "GET",

@@ -49,3 +49,14 @@ export class ApiKeyInvalidError extends ApiKeyError {
     });
   }
 }
+
+export class ApiKeyRevokeFailedError extends ApiKeyError {
+  constructor(detail?: string) {
+    super({
+      title: "API key revoke failed",
+      status: 500,
+      detail: detail ?? "The API key could not be revoked due to an internal server error.",
+      code: "API_KEY_REVOKE_FAILED"
+    });
+  }
+}
