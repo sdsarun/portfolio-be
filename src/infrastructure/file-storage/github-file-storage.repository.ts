@@ -2,7 +2,7 @@ import {
   type DeleteRepositoryFileInput,
   type UpsertRepositoryFileInput,
   type UpsertRepositoryFileOutput,
-  type FileStorageRepositoryPort,
+  type FileStorageRepository,
   type DeleteRepositoryFileOutput,
   type GetRepositoryFileInput,
   type GetRepositoryFileOutput
@@ -17,7 +17,7 @@ export type GithubFileStorageOptions = Pick<OctokitOptions, "log"> & {
   branch: string;
 };
 
-export class GithubFileStorageRepository implements FileStorageRepositoryPort {
+export class GithubFileStorageRepository implements FileStorageRepository {
   private readonly client: Octokit;
   private readonly repoName: string;
   private readonly directoryPath: string;
