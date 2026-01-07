@@ -44,6 +44,8 @@ import { HealthRoutes } from "../../adapters/http/routes/health/health.route";
 import { CreateApiKeyUseCase } from "../../core/usecases/create-api-key/create-api-key.usecase";
 import { CreateApiKeyHandler } from "../../adapters/http/routes/api-keys/handlers/create-api-key/create-api-key.handler";
 import { ApiKeysRoutes } from "../../adapters/http/routes/api-keys/api-keys.route";
+import { GetApiKeysUseCase } from "../../core/usecases/get-api-keys/get-api-keys.usecase";
+import { GetApiKeysHandler } from "../../adapters/http/routes/api-keys/handlers/get-api-keys/get-api-keys.handler";
 
 export type ApplicationContext = {
   external: {
@@ -168,10 +170,15 @@ export function createApplicationContext(): ApplicationContext {
   const healthRoutes = new HealthRoutes({ healthHandler });
 
   // /api-keys
+  const getApiKeysUseCase = new GetApiKeysUseCase({ uow });
+  const getApiKeysHandler = new GetApiKeysHandler({ getApiKeysUseCase });
+
   const createApiKeyUseCase = new CreateApiKeyUseCase({ uow, apiKeyGenerator });
   const createApiKeyHandler = new CreateApiKeyHandler({ createApiKeyUseCase });
+
   const apiKeysRoutes = new ApiKeysRoutes({
     requiredTokenMiddleware,
+    getApiKeysHandler,
     createApiKeyHandler
   });
 
