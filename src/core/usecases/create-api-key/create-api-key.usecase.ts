@@ -1,4 +1,5 @@
 import { Scope } from "../../constants/scope.constant";
+import { ApiKeyCreateFailedError } from "../../errors/api-key.errors";
 import { BaseError } from "../../errors/base.error";
 import { type ApiKeyGenerator } from "../../ports/api-key-generator.port";
 import { type UnitOfWork } from "../../ports/unit-of-work.port";
@@ -33,7 +34,7 @@ export class CreateApiKeyUseCase implements CreateApiKeyUseCasePort {
         if (error instanceof BaseError) {
           throw error;
         }
-        throw error;
+        throw new ApiKeyCreateFailedError(error instanceof Error ? error.message : undefined);
       }
     });
   }

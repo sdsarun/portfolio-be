@@ -6,13 +6,35 @@ export class ApiKeyError extends BaseError {
   }
 }
 
-export class ApiKeyCreateFailedError extends ApiKeyError {
+export class ApiKeyNotFoundError extends ApiKeyError {
   constructor() {
+    super({
+      title: "API key not found",
+      status: 404,
+      detail: "The provided API key does not exist or has been deleted.",
+      code: "API_KEY_NOT_FOUND"
+    });
+  }
+}
+
+export class ApiKeyCreateFailedError extends ApiKeyError {
+  constructor(detail?: string) {
     super({
       title: "API key creation failed",
       status: 500,
-      detail: "The API key could not be created due to an internal error.",
+      detail: detail ?? "The API key could not be created due to an internal error.",
       code: "API_KEY_CREATE_FAILED"
+    });
+  }
+}
+
+export class ApiKeyDeleteFailedError extends ApiKeyError {
+  constructor(detail?: string) {
+    super({
+      title: "API key deletion failed",
+      status: 500,
+      detail: detail ?? "The API key could not be deleted due to an internal error.",
+      code: "API_KEY_DELETE_FAILED"
     });
   }
 }

@@ -1,7 +1,7 @@
 import { type ApiKeyAttributes, ApiKey } from "../../../../core/entities/api-key/api-key.entity";
 import {
-  FindPaginatedOutput,
-  FindPaginatedParams,
+  type FindPaginatedOutput,
+  type FindPaginatedParams,
   type ApiKeyRepository
 } from "../../../../core/entities/api-key/api-key.repository";
 import { type PrismaClientOrTransaction } from "../prisma-database-session";
@@ -9,7 +9,6 @@ import { type ApiKey as PrismaApiKeyModel, type Prisma } from "../../../../../ge
 
 export class PrismaApiKeyRepository implements ApiKeyRepository {
   constructor(private readonly prisma: PrismaClientOrTransaction) {}
-
   private readonly toEntity = (record: PrismaApiKeyModel): ApiKey => new ApiKey(record);
 
   async create(attributes: Partial<ApiKeyAttributes>): Promise<ApiKey> {
@@ -57,9 +56,16 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
     };
   }
 
+  async findById(id: string): Promise<ApiKey | null> {
+    const record = await this.prisma.apiKey.findUnique({
+      where: { id, revokedAt: null, expiresAt: null, deletedAt: null }
+    });
+    return record ? this.toEntity(record) : null;
+  }
+
   async findByHashedKey(hashedKey: string): Promise<ApiKey | null> {
     const record = await this.prisma.apiKey.findUnique({
-      where: { hashedKey, revokedAt: null, expiresAt: null }
+      where: { hashedKey, revokedAt: null, expiresAt: null, deletedAt: null }
     });
     return record ? this.toEntity(record) : null;
   }
@@ -68,6 +74,13 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
     await this.prisma.apiKey.updateMany({
       data: { revokedAt: new Date() },
       where: { id: { in: id } }
+    });
+  }
+
+  async softDeleteById(id: string): Promise<void> {
+    await this.prisma.apiKey.update({
+      data: { deletedAt: new Date() },
+      where: { id }
     });
   }
 }
