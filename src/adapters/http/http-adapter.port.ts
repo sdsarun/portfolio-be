@@ -33,7 +33,7 @@ export type HttpContext<
 };
 
 export type HttpMiddleware<TContext extends HttpRequestInput = HttpRequestInput> = {
-  handle(ctx: HttpContext<TContext>): Promise<void> | void;
+  handle(ctx: HttpContext<TContext>): Promise<void>;
 };
 
 export type HttpHandler<TContext extends HttpRequestInput = HttpRequestInput, TResponse = any> = {
