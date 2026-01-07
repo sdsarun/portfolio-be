@@ -1,8 +1,5 @@
-import { type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
-import {
-  type HttpPingHealthCheck,
-  type HealthCheck
-} from "../../../../../../core/ports/health-check.port";
+import { type HealthCheck, type HttpPingHealthCheck } from "../../../../../core/ports/health-check.port";
+import { type HttpHandler, type HttpResponse } from "../../../http-adapter.port";
 
 export type HealthHandlerPort = HttpHandler;
 

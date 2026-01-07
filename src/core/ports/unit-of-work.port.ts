@@ -1,3 +1,4 @@
+import { type ApiKeyRepository } from "../entities/api-key/api-key.repository";
 import { type AttachmentRepository } from "../entities/attachment/attachment.repository";
 import { type AuthRepository } from "../entities/auth/auth.repository";
 import { type CertificationRepository } from "../entities/certifications/certification.repository";
@@ -23,5 +24,6 @@ export type UnitOfWork = {
   contact: ContactRepository;
   attachment: AttachmentRepository;
   projectExperienceAttachment: ProjectExperienceAttachmentRepository;
+  apiKey: ApiKeyRepository;
   runInTransaction<T>(handler: (uow: TransactionalUnitOfWork) => Promise<T>): Promise<T>;
 };

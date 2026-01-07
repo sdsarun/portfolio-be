@@ -1,13 +1,8 @@
-import { BaseError } from "./base.error";
+import { BaseError, type BaseErrorOptions } from "./base.error";
 
 export class AuthError extends BaseError {
-  constructor(options: { title: string; status: number; detail?: string; code: string }) {
-    super({
-      title: options.title,
-      status: options.status,
-      detail: options.detail,
-      code: options.code
-    });
+  constructor(options: BaseErrorOptions) {
+    super(options);
   }
 }
 

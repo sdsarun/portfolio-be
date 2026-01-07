@@ -1,6 +1,12 @@
-import { BaseError } from "./base.error";
+import { BaseError, type BaseErrorOptions } from "./base.error";
 
-export class AttachmentUploadError extends BaseError {
+export class AttachmentError extends BaseError {
+  constructor(options: BaseErrorOptions) {
+    super(options);
+  }
+}
+
+export class AttachmentUploadError extends AttachmentError {
   constructor(fileName: string, detail?: string) {
     super({
       title: "Attachment upload failed",
@@ -11,7 +17,7 @@ export class AttachmentUploadError extends BaseError {
   }
 }
 
-export class AttachmentDeleteError extends BaseError {
+export class AttachmentDeleteError extends AttachmentError {
   constructor(fileName: string, detail?: string) {
     super({
       title: "Attachment delete failed",

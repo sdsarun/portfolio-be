@@ -4,8 +4,6 @@ import { type HttpRouteDefinition } from "../../adapters/http/http-adapter.port"
 import { RequiredTokenMiddleware } from "../../adapters/http/middlewares/required-token.middleware";
 import { SignInHandler } from "../../adapters/http/routes/auth/handlers/signin/signin.handler";
 import { AuthRoutes } from "../../adapters/http/routes/auth/auth.route";
-import { HealthHandler } from "../../adapters/http/routes/system/handlers/health/health.handler";
-import { SystemRoutes } from "../../adapters/http/routes/system/system.route";
 import { env } from "../env/env.config";
 import { Argon2PasswordHasher } from "../security/argon2.password-hasher";
 import { JwtTokenCryptor } from "../security/jwt.token-cryptor";
@@ -39,6 +37,13 @@ import { GetProfileWorkHandler } from "../../adapters/http/routes/profile/handle
 import { GetProfileContactHandler } from "../../adapters/http/routes/profile/handlers/get-contact/get-profile-contact.handler";
 import { GithubFileStorageRepository } from "../file-storage/github-file-storage.repository";
 import { logger } from "../logger/logger";
+import { DefaultApiKeyGenerator } from "../security/api-key-generator";
+import { Sha256Hasher } from "../security/sha256-hasher";
+import { HealthHandler } from "../../adapters/http/routes/health/handlers/health.handler";
+import { HealthRoutes } from "../../adapters/http/routes/health/health.route";
+import { CreateApiKeyUseCase } from "../../core/usecases/create-api-key/create-api-key.usecase";
+import { CreateApiKeyHandler } from "../../adapters/http/routes/api-keys/handlers/create-api-key/create-api-key.handler";
+import { ApiKeysRoutes } from "../../adapters/http/routes/api-keys/api-keys.route";
 
 export type ApplicationContext = {
   external: {
@@ -65,6 +70,8 @@ export function createApplicationContext(): ApplicationContext {
     defaultExpiresIn: env.TOKEN_EXP,
     defaultIssuer: env.SERVICE_NAME
   });
+  const sha256Hasher = new Sha256Hasher();
+  const apiKeyGenerator = new DefaultApiKeyGenerator(sha256Hasher);
 
   // storages
   const githubFileStorageRepository = new GithubFileStorageRepository({
@@ -152,19 +159,27 @@ export function createApplicationContext(): ApplicationContext {
     getProfileLatestStatsHandler
   });
 
-  // /system
+  // /health
   const healthHandler = new HealthHandler({
     dbCheck: prismaDatabaseHealthCheck,
     pingCheck: fetchHttpPingHealthCheck,
     portfolioSiteUrl: env.PORTFOLIO_SITE_URL
   });
-  const systemRoutes = new SystemRoutes({ healthHandler });
+  const healthRoutes = new HealthRoutes({ healthHandler });
+
+  // /api-keys
+  const createApiKeyUseCase = new CreateApiKeyUseCase({ uow, apiKeyGenerator });
+  const createApiKeyHandler = new CreateApiKeyHandler({ createApiKeyUseCase });
+  const apiKeysRoutes = new ApiKeysRoutes({
+    requiredTokenMiddleware,
+    createApiKeyHandler
+  });
 
   return {
     external: {
       db: prisma,
       cache
     },
-    routes: [systemRoutes, authRoutes, profileRoutes]
+    routes: [healthRoutes, authRoutes, profileRoutes, apiKeysRoutes]
   };
 }

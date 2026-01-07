@@ -9,12 +9,12 @@ export type HttpRequestInput = {
   cookies?: any;
 };
 
-export type HttpRequest<T extends HttpRequestInput = HttpRequestInput> = {
-  body?: T["body"];
-  query?: T["query"];
-  params?: T["params"];
-  headers?: T["headers"];
-  cookies?: T["cookies"];
+export type HttpRequest<TRequestInput extends HttpRequestInput = HttpRequestInput> = {
+  body?: TRequestInput["body"];
+  query?: TRequestInput["query"];
+  params?: TRequestInput["params"];
+  headers?: TRequestInput["headers"];
+  cookies?: TRequestInput["cookies"];
   requestMeta: {
     path: string;
     ip: string;
@@ -22,19 +22,22 @@ export type HttpRequest<T extends HttpRequestInput = HttpRequestInput> = {
   };
 };
 
-export type HttpResponse = { statusCode: number; data: any };
+export type HttpResponse<TData = any> = { statusCode: number; data: TData };
 
-export type HttpContext<T extends HttpRequestInput = HttpRequestInput, S = Record<string, any>> = {
-  request: HttpRequest<T>;
-  state: S;
+export type HttpContext<
+  TRequest extends HttpRequestInput = HttpRequestInput,
+  TState = Record<string, any>
+> = {
+  request: HttpRequest<TRequest>;
+  state: TState;
 };
 
-export type HttpMiddleware<T extends HttpRequestInput = HttpRequestInput> = {
-  handle(ctx: HttpContext<T>): Promise<void> | void;
+export type HttpMiddleware<TContext extends HttpRequestInput = HttpRequestInput> = {
+  handle(ctx: HttpContext<TContext>): Promise<void> | void;
 };
 
-export type HttpHandler<T extends HttpRequestInput = HttpRequestInput> = {
-  handle(ctx: HttpContext<T>): Promise<HttpResponse>;
+export type HttpHandler<TContext extends HttpRequestInput = HttpRequestInput, TResponse = any> = {
+  handle(ctx: HttpContext<TContext>): Promise<HttpResponse<TResponse>>;
 };
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
