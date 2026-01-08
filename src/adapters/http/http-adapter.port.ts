@@ -96,7 +96,6 @@ export async function executeHttpRoute(
 
     return reply.success(response);
   } catch (error) {
-    console.log("[LOG] - http-adapter.port.ts:99 - executeHttpRoute - error:", error);
     let problemDetails: ProblemDetail;
 
     if (error instanceof BaseError) {
