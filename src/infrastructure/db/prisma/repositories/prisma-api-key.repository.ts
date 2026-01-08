@@ -58,14 +58,14 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
 
   async findById(id: string): Promise<ApiKey | null> {
     const record = await this.prisma.apiKey.findUnique({
-      where: { id, revokedAt: null, expiresAt: null, deletedAt: null }
+      where: { id, deletedAt: null }
     });
     return record ? this.toEntity(record) : null;
   }
 
   async findByHashedKey(hashedKey: string): Promise<ApiKey | null> {
     const record = await this.prisma.apiKey.findUnique({
-      where: { hashedKey, revokedAt: null, expiresAt: null, deletedAt: null }
+      where: { hashedKey, deletedAt: null }
     });
     return record ? this.toEntity(record) : null;
   }

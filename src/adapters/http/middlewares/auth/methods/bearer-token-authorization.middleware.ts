@@ -1,30 +1,31 @@
-import { type HttpContext, type HttpMiddleware } from "../http-adapter.port";
-import { type TokenCryptor } from "../../../core/ports/token-cryptor.port";
-import { UnauthorizedError } from "../../../core/errors/auth.error";
+import { UnauthorizedError } from "../../../../../core/errors/auth.error";
+import { BaseError } from "../../../../../core/errors/base.error";
+import { type TokenCryptor } from "../../../../../core/ports/token-cryptor.port";
+import { type HttpMiddleware, type HttpContext } from "../../../http-adapter.port";
 
-export class RequiredTokenMiddleware implements HttpMiddleware {
+export class BearerTokenAuthorizationMiddleware implements HttpMiddleware {
   constructor(private readonly deps: { tokenCryptor: TokenCryptor }) {}
 
   async handle(ctx: HttpContext): Promise<void> {
-    const request = ctx.request;
-    const authorization = request.headers["authorization"];
-    if (!authorization) {
-      throw new UnauthorizedError("Missing Authorization header");
+    if (ctx.state?.isAuthenticated) {
+      return;
     }
 
+    const request = ctx.request;
     try {
       const token = this.extractTokenFromHeader(request.headers);
       if (!token) {
-        throw new UnauthorizedError("Missing bearer token");
+        throw new UnauthorizedError();
       }
       const payload = await this.deps.tokenCryptor.verify(token);
 
-      // attach data to http context
       ctx.state = {
+        authType: "bearer",
+        isAuthenticated: true,
         user: payload
       };
     } catch (error) {
-      if (error instanceof UnauthorizedError) {
+      if (error instanceof BaseError) {
         throw error;
       }
       throw new UnauthorizedError();
