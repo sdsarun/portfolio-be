@@ -1,7 +1,6 @@
 import { type Cache } from "../../core/ports/cache.port";
 import { SignInUseCase } from "../../core/usecases/signin/signin.usecase";
 import { type HttpRouteDefinition } from "../../adapters/http/http-adapter.port";
-import { RequiredTokenMiddleware } from "../../adapters/http/middlewares/required-token.middleware";
 import { SignInHandler } from "../../adapters/http/routes/auth/handlers/signin/signin.handler";
 import { AuthRoutes } from "../../adapters/http/routes/auth/auth.route";
 import { env } from "../env/env.config";
@@ -50,6 +49,9 @@ import { DeleteApiKeyByIdHandler } from "../../adapters/http/routes/api-keys/han
 import { RevokeApiKeysHandler } from "../../adapters/http/routes/api-keys/handlers/revoke-api-keys/revoke-api-keys.handler";
 import { RevokeApiKeysUseCase } from "../../core/usecases/revoke-api-keys/revoke-api-keys.usecase";
 import { GetProfileLatestStatusHandler } from "../../adapters/http/routes/profile/handlers/get-latest-stats/get-profile-latest-stats.handler";
+import { ApiKeyAuthorizationMiddleware } from "../../adapters/http/middlewares/auth/methods/api-key-authorization.middleware";
+import { BearerTokenAuthorizationMiddleware } from "../../adapters/http/middlewares/auth/methods/bearer-token-authorization.middleware";
+import { AccessControlMiddleware } from "../../adapters/http/middlewares/auth/access-control.middleware";
 
 export type ApplicationContext = {
   external: {
@@ -95,7 +97,14 @@ export function createApplicationContext(): ApplicationContext {
   });
 
   // middlewares
-  const requiredTokenMiddleware = new RequiredTokenMiddleware({ tokenCryptor });
+  const bearerTokenAuthorizationMiddleware = new BearerTokenAuthorizationMiddleware({ tokenCryptor });
+  const apiKeyAuthorizationMiddleware = new ApiKeyAuthorizationMiddleware({ uow, sha256Hasher });
+  const accessControlMiddleware = new AccessControlMiddleware({
+    accessMethods: {
+      apikey: apiKeyAuthorizationMiddleware,
+      bearer: bearerTokenAuthorizationMiddleware
+    }
+  });
 
   // /auth
   const signInUseCase = new SignInUseCase({ uow, passwordHasher, tokenCryptor });
@@ -109,7 +118,7 @@ export function createApplicationContext(): ApplicationContext {
   const updatePasswordHandler = new UpdatePasswordHandler({ updatePasswordUseCase });
 
   const authRoutes = new AuthRoutes({
-    requiredTokenMiddleware,
+    accessControlMiddleware,
     signInHandler,
     updatePasswordHandler
   });
@@ -165,7 +174,7 @@ export function createApplicationContext(): ApplicationContext {
   });
 
   const profileRoutes = new ProfileRoutes({
-    requiredTokenMiddleware,
+    accessControlMiddleware,
     getProfileHandler,
     getProfileInfoHandler,
     getProfileResumeHandler,
@@ -200,7 +209,7 @@ export function createApplicationContext(): ApplicationContext {
   const revokeApiKeysHandler = new RevokeApiKeysHandler({ revokeApiKeysUseCase });
 
   const apiKeysRoutes = new ApiKeysRoutes({
-    requiredTokenMiddleware,
+    accessControlMiddleware,
     getApiKeysHandler,
     createApiKeyHandler,
     deleteApiKeyByIdHandler,
