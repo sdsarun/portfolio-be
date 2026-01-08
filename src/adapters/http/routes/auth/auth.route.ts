@@ -1,15 +1,12 @@
-import {
-  type HttpMiddleware,
-  type HttpRoute,
-  type HttpRouteDefinition
-} from "../../http-adapter.port";
+import { type HttpRoute, type HttpRouteDefinition } from "../../http-adapter.port";
+import { type AccessControlMiddleware } from "../../middlewares/auth/access-control.middleware";
 import { type SignInHandlerPort } from "./handlers/signin/signin.handler";
 import { type UpdatePasswordHandlerPort } from "./handlers/update-password/update-password.handler";
 
 export class AuthRoutes implements HttpRouteDefinition {
   constructor(
     private readonly deps: {
-      requiredTokenMiddleware: HttpMiddleware;
+      accessControlMiddleware: AccessControlMiddleware;
       signInHandler: SignInHandlerPort;
       updatePasswordHandler: UpdatePasswordHandlerPort;
     }
@@ -27,7 +24,7 @@ export class AuthRoutes implements HttpRouteDefinition {
         method: "POST",
         path: "/auth/update-password",
         version: 1,
-        middlewares: [this.deps.requiredTokenMiddleware],
+        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer"] })],
         handler: this.deps.updatePasswordHandler
       }
     ];
