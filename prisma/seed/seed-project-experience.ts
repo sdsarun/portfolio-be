@@ -24,7 +24,16 @@ const projectSeedData: ProjectSeed[] = [
       { name: "Live", url: "https://whispa.sdsarun.dev" },
       { name: "GitHub", url: "https://github.com/boonpermyo/whispa" }
     ],
-    attachments: []
+    attachments: [
+      {
+        name: "whispa.png",
+        storedPath: "screenshots/portfolio/whispa.png",
+        sha: "6b54f2910822aa46603d4ef13eda1919578fba86",
+        size: 182131,
+        streamUrl:
+          "https://raw.githubusercontent.com/sdsarun/assets/main/screenshots/portfolio/whispa.png"
+      }
+    ]
   },
   {
     title: "Portfolio CMS",
@@ -37,7 +46,16 @@ const projectSeedData: ProjectSeed[] = [
       { name: "Live", url: "https://portfolio-cms.sdsarun.dev/work" },
       { name: "GitHub", url: "https://github.com/sdsarun/portfolio-cms" }
     ],
-    attachments: []
+    attachments: [
+      {
+        name: "portfolio-cms.png",
+        storedPath: "screenshots/portfolio/portfolio-cms.png",
+        sha: "4f38d08ff81562caee486bb81ed174ff0b73bd6d",
+        size: 99876,
+        streamUrl:
+          "https://raw.githubusercontent.com/sdsarun/assets/main/screenshots/portfolio/portfolio-cms.png"
+      }
+    ]
   },
   {
     title: "No More Random AD",
