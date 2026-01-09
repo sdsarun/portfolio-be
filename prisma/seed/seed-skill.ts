@@ -23,7 +23,7 @@ const skillSeedData = [
   },
   {
     categoryName: "Tools / Platforms",
-    skillNames: ["Git", "GitLab", "Docker", "Keycloak", "MinIO", "Swagger", "VIM"]
+    skillNames: ["Git", "GitLab", "Docker", "Keycloak", "MinIO"]
   },
   {
     categoryName: "Databases",
