@@ -36,7 +36,7 @@ export class InMemoryCache implements Cache {
   }
 
   async set(key: string, value: string, options?: CacheSetOptions): Promise<void> {
-    const ttl = options?.ttl ?? this.defaultTtlSeconds;
+    const ttl = options?.ttlSeconds ?? this.defaultTtlSeconds;
 
     if (ttl <= 0) {
       this.memo.delete(key);

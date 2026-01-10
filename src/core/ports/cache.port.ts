@@ -1,5 +1,5 @@
 export type CacheSetOptions = {
-  ttl?: number; // seconds
+  ttlSeconds?: number;
 };
 
 export type Cache = {
