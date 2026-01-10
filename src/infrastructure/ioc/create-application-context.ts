@@ -8,7 +8,6 @@ import { Argon2PasswordHasher } from "../security/argon2.password-hasher";
 import { JwtTokenCryptor } from "../security/jwt.token-cryptor";
 import { DatabaseManager } from "../db/database-manager";
 import { PrismaUnitOfWork } from "../db/prisma/prisma-unit-of-work";
-import { InMemoryCache } from "../cache/in-memory.cache";
 import { PrismaDatabaseHealthCheck } from "../health/prisma-database.health";
 import { FetchHttpPingHealthCheck } from "../health/http.health";
 import { UpdatePasswordHandler } from "../../adapters/http/routes/auth/handlers/update-password/update-password.handler";
@@ -52,6 +51,7 @@ import { GetProfileLatestStatusHandler } from "../../adapters/http/routes/profil
 import { ApiKeyAuthorizationMiddleware } from "../../adapters/http/middlewares/auth/methods/api-key-authorization.middleware";
 import { BearerTokenAuthorizationMiddleware } from "../../adapters/http/middlewares/auth/methods/bearer-token-authorization.middleware";
 import { AccessControlMiddleware } from "../../adapters/http/middlewares/auth/access-control.middleware";
+import { CacheManager } from "../cache/cache-manager";
 
 export type ApplicationContext = {
   external: {
@@ -63,7 +63,7 @@ export type ApplicationContext = {
 
 export function createApplicationContext(): ApplicationContext {
   const prisma = DatabaseManager.get("prisma");
-  const cache = new InMemoryCache();
+  const cache = CacheManager.get("redis");
 
   const uow = new PrismaUnitOfWork({ prisma: prisma.session() });
 
