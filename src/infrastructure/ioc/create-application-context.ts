@@ -52,6 +52,18 @@ import { ApiKeyAuthorizationMiddleware } from "../../adapters/http/middlewares/a
 import { BearerTokenAuthorizationMiddleware } from "../../adapters/http/middlewares/auth/methods/bearer-token-authorization.middleware";
 import { AccessControlMiddleware } from "../../adapters/http/middlewares/auth/access-control.middleware";
 import { CacheManager } from "../cache/cache-manager";
+import { ZodRequestValidatorMiddleware } from "../../adapters/http/middlewares/zod-request-validator.middleware";
+import { signInBodyDTOSchema } from "../../adapters/http/routes/auth/handlers/signin/signin.dto";
+import { updatePasswordBodyDTOSchema } from "../../adapters/http/routes/auth/handlers/update-password/update-password.dto";
+import { getApiKeysQueryDTOSchema } from "../../adapters/http/routes/api-keys/handlers/get-api-keys/get-api-keys.dto";
+import { createApiKeyBodyDTOSchema } from "../../adapters/http/routes/api-keys/handlers/create-api-key/create-api-key.dto";
+import { deleteApiKeyByIdParamsDTOSchema } from "../../adapters/http/routes/api-keys/handlers/delete-api-key-by-id/delete-api-key-by-id.dto";
+import { revokeApiKeysBodyDTOSchema } from "../../adapters/http/routes/api-keys/handlers/revoke-api-keys/revoke-api-keys.dto";
+import { getProfileLatestStatusQueryDTOSchema } from "../../adapters/http/routes/profile/handlers/get-latest-stats/get-profile-latest-stats.dto";
+import { upsertProfileInfoBodyDTOSchema } from "../../adapters/http/routes/profile/handlers/upsert-info/upsert-profile-info.dto";
+import { upsertProfileResumeBodyDTOSchema } from "../../adapters/http/routes/profile/handlers/upsert-resume/upsert-profile-resume.dto";
+import { upsertProfileWorkBodyDTOSchema } from "../../adapters/http/routes/profile/handlers/upsert-work/upsert-profile-work.dto";
+import { upsertProfileContactBodyDTOSchema } from "../../adapters/http/routes/profile/handlers/upsert-contact/upsert-profile-contact.dto";
 
 export type ApplicationContext = {
   external: {
@@ -101,13 +113,14 @@ export function createApplicationContext(): ApplicationContext {
   const apiKeyAuthorizationMiddleware = new ApiKeyAuthorizationMiddleware({ uow, sha256Hasher });
   const accessControlMiddleware = new AccessControlMiddleware({
     accessMethods: {
-      apikey: apiKeyAuthorizationMiddleware,
+      "api-key": apiKeyAuthorizationMiddleware,
       bearer: bearerTokenAuthorizationMiddleware
     }
   });
 
   // /auth
   const signInUseCase = new SignInUseCase({ uow, passwordHasher, tokenCryptor });
+  const signInRequestValidator = new ZodRequestValidatorMiddleware({ body: signInBodyDTOSchema });
   const signInHandler = new SignInHandler({ signInUseCase });
 
   const updatePasswordUseCase = new UpdatePasswordUseCase({
@@ -115,12 +128,17 @@ export function createApplicationContext(): ApplicationContext {
     passwordHasher,
     authId: env.AUTH_ID
   });
+  const updatePasswordRequestValidator = new ZodRequestValidatorMiddleware({
+    body: updatePasswordBodyDTOSchema
+  });
   const updatePasswordHandler = new UpdatePasswordHandler({ updatePasswordUseCase });
 
   const authRoutes = new AuthRoutes({
     accessControlMiddleware,
     signInHandler,
-    updatePasswordHandler
+    signInRequestValidator,
+    updatePasswordHandler,
+    updatePasswordRequestValidator
   });
 
   // /profile
@@ -139,12 +157,29 @@ export function createApplicationContext(): ApplicationContext {
   const getProfileContactUseCase = new GetProfileContactUseCase({ uow, authId: env.AUTH_ID });
   const getProfileContactHandler = new GetProfileContactHandler({ getProfileContactUseCase });
 
+  const getProfileLatestUpdatedUseCase = new GetProfileLatestUpdatedUseCase({
+    uow,
+    authId: env.AUTH_ID
+  });
+  const getProfileLatestStatusRequestValidator = new ZodRequestValidatorMiddleware({
+    query: getProfileLatestStatusQueryDTOSchema
+  });
+  const getProfileLatestStatusHandler = new GetProfileLatestStatusHandler({
+    getProfileLatestUpdatedUseCase
+  });
+
   const upsertProfileInfoUseCase = new UpsertProfileInfoUseCase({ uow, authId: env.AUTH_ID });
+  const upsertProfileInfoRequestValidator = new ZodRequestValidatorMiddleware({
+    body: upsertProfileInfoBodyDTOSchema
+  });
   const upsertProfileInfoHandler = new UpsertProfileInfoHandler({ upsertProfileInfoUseCase });
 
   const upsertProfileResumeUseCase = new UpsertProfileResumeUseCase({
     uow,
     authId: env.AUTH_ID
+  });
+  const upsertProfileResumeRequestValidator = new ZodRequestValidatorMiddleware({
+    body: upsertProfileResumeBodyDTOSchema
   });
   const upsertProfileResumeHandler = new UpsertProfileResumeHandler({
     upsertProfileResumeUseCase
@@ -155,22 +190,19 @@ export function createApplicationContext(): ApplicationContext {
     fileStorageRepository: githubFileStorageRepository,
     authId: env.AUTH_ID
   });
-
+  const upsertProfileWorkRequestValidator = new ZodRequestValidatorMiddleware({
+    body: upsertProfileWorkBodyDTOSchema
+  });
   const upsertProfileWorkHandler = new UpsertProfileWorkHandler({
     upsertProfileWorkUseCase
   });
 
   const upsertProfileContactUseCase = new UpsertProfileContactUseCase({ uow, authId: env.AUTH_ID });
+  const upsertProfileContactRequestValidator = new ZodRequestValidatorMiddleware({
+    body: upsertProfileContactBodyDTOSchema
+  });
   const upsertProfileContactHandler = new UpsertProfileContactHandler({
     upsertProfileContactUseCase
-  });
-
-  const getProfileLatestUpdatedUseCase = new GetProfileLatestUpdatedUseCase({
-    uow,
-    authId: env.AUTH_ID
-  });
-  const getProfileLatestStatusHandler = new GetProfileLatestStatusHandler({
-    getProfileLatestUpdatedUseCase
   });
 
   const profileRoutes = new ProfileRoutes({
@@ -181,10 +213,15 @@ export function createApplicationContext(): ApplicationContext {
     getProfileWorkHandler,
     getProfileContactHandler,
     getProfileLatestStatusHandler,
+    getProfileLatestStatusRequestValidator,
     upsertProfileInfoHandler,
+    upsertProfileInfoRequestValidator,
     upsertProfileResumeHandler,
+    upsertProfileResumeRequestValidator,
     upsertProfileWorkHandler,
-    upsertProfileContactHandler
+    upsertProfileWorkRequestValidator,
+    upsertProfileContactHandler,
+    upsertProfileContactRequestValidator
   });
 
   // /health
@@ -198,22 +235,38 @@ export function createApplicationContext(): ApplicationContext {
   // /api-keys
   const getApiKeysUseCase = new GetApiKeysUseCase({ uow });
   const getApiKeysHandler = new GetApiKeysHandler({ getApiKeysUseCase });
+  const getApiKeysRequestValidator = new ZodRequestValidatorMiddleware({
+    query: getApiKeysQueryDTOSchema
+  });
 
   const createApiKeyUseCase = new CreateApiKeyUseCase({ uow, apiKeyGenerator });
   const createApiKeyHandler = new CreateApiKeyHandler({ createApiKeyUseCase });
+  const createApiKeyRequestValidator = new ZodRequestValidatorMiddleware({
+    body: createApiKeyBodyDTOSchema
+  });
 
   const deleteApiKeyByIdUseCase = new DeleteApiKeyByIdUseCase({ uow });
   const deleteApiKeyByIdHandler = new DeleteApiKeyByIdHandler({ deleteApiKeyByIdUseCase });
+  const deleteApiKeyRequestValidator = new ZodRequestValidatorMiddleware({
+    params: deleteApiKeyByIdParamsDTOSchema
+  });
 
   const revokeApiKeysUseCase = new RevokeApiKeysUseCase({ uow });
   const revokeApiKeysHandler = new RevokeApiKeysHandler({ revokeApiKeysUseCase });
+  const revokeApiKeysRequestValidator = new ZodRequestValidatorMiddleware({
+    body: revokeApiKeysBodyDTOSchema
+  });
 
   const apiKeysRoutes = new ApiKeysRoutes({
     accessControlMiddleware,
     getApiKeysHandler,
+    getApiKeysRequestValidator,
     createApiKeyHandler,
+    createApiKeyRequestValidator,
     deleteApiKeyByIdHandler,
-    revokeApiKeysHandler
+    deleteApiKeyRequestValidator,
+    revokeApiKeysHandler,
+    revokeApiKeysRequestValidator
   });
 
   return {
