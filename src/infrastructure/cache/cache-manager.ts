@@ -46,12 +46,17 @@ export class CacheManager {
     this.sessions = {};
   }
 
+  static async clearAllCache<Name extends CacheBackendName>(backend: Name): Promise<void> {
+    const session = await this.getConnected(backend);
+    await session.delPattern(`${env.CACHE_NAMESPACE}*`);
+  }
+
   private static create<Name extends CacheBackendName>(backend: Name): CacheBackends[Name] {
     switch (backend) {
       case "memory":
-        return new InMemoryCache();
+        return new InMemoryCache({ prefixKey: env.CACHE_NAMESPACE, logger });
       case "redis": {
-        return new RedisCache({ url: env.REDIS_URL, logger: logger });
+        return new RedisCache({ url: env.REDIS_URL, prefixKey: env.CACHE_NAMESPACE, logger });
       }
       default:
         throw new Error(`Unsupported cache backend: ${String(backend)}`);

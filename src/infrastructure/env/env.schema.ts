@@ -25,6 +25,7 @@ export const envSchema = z
     GITHUB_STORAGE_BRANCH: z.string().min(1, "GITHUB_STORAGE_BRANCH is required"),
     GITHUB_STORAGE_DIRECTORY_PATH: z.string().min(1, "GITHUB_STORAGE_DIRECTORY_PATH is required"),
     GITHUB_API_VERSION: z.string().min(1, "GITHUB_API_VERSION is required"),
+    CACHE_NAMESPACE: z.string().min(1, "CACHE_NAMESPACE is required"),
     REDIS_URL: z.string().min(1, "REDIS_URL is required")
   })
   .readonly();

@@ -29,7 +29,7 @@ export function createFastifyApp(): HttpAppliaction {
   const ctx = createApplicationContext();
   const { db, cache } = ctx.external;
 
-  fastifyRegisterRoutes(server, ctx.routes);
+  fastifyRegisterRoutes(server, ctx.routes, { cache });
 
   return {
     async listen(options): Promise<void> {

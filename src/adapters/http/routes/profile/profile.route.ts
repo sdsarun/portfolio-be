@@ -1,4 +1,4 @@
-import { type HttpRoute, type HttpRouteDefinition } from "../../http-adapter.port";
+import { type HttpMiddleware, type HttpRoute, type HttpRouteDefinition } from "../../http-adapter.port";
 import { type GetProfileHandlerPort } from "./handlers/get-profile/get-profile.handler";
 import { type UpsertProfileInfoHandlerPort } from "./handlers/upsert-info/upsert-profile-info.handler";
 import { type UpsertProfileResumeHandlerPort } from "./handlers/upsert-resume/upsert-profile-resume.handler";
@@ -10,6 +10,7 @@ import { type GetProfileResumeHandlerPort } from "./handlers/get-resume/get-prof
 import { type GetProfileWorkHandlerPort } from "./handlers/get-work/get-profile-work.handler";
 import { type GetProfileContactHandlerPort } from "./handlers/get-contact/get-profile-contact.handler";
 import { type AccessControlMiddleware } from "../../middlewares/auth/access-control.middleware";
+import { ProfileCacheKeys } from "../../../../core/cache/cache-keys/profile.cache-keys";
 
 export class ProfileRoutes implements HttpRouteDefinition {
   constructor(
@@ -21,10 +22,15 @@ export class ProfileRoutes implements HttpRouteDefinition {
       getProfileWorkHandler: GetProfileWorkHandlerPort;
       getProfileContactHandler: GetProfileContactHandlerPort;
       getProfileLatestStatusHandler: GetProfileLatestStatusHandlerPort;
+      getProfileLatestStatusRequestValidator: HttpMiddleware;
       upsertProfileInfoHandler: UpsertProfileInfoHandlerPort;
+      upsertProfileInfoRequestValidator: HttpMiddleware;
       upsertProfileResumeHandler: UpsertProfileResumeHandlerPort;
+      upsertProfileResumeRequestValidator: HttpMiddleware;
       upsertProfileWorkHandler: UpsertProfileWorkHandlerPort;
+      upsertProfileWorkRequestValidator: HttpMiddleware;
       upsertProfileContactHandler: UpsertProfileContactHandlerPort;
+      upsertProfileContactRequestValidator: HttpMiddleware;
     }
   ) {}
 
@@ -34,71 +40,122 @@ export class ProfileRoutes implements HttpRouteDefinition {
         method: "GET",
         path: "/profile",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.getProfileHandler
+        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] })],
+        handler: this.deps.getProfileHandler,
+        cache: {
+          key: ProfileCacheKeys.getProfile,
+          ttlSeconds: 60 * 60
+        }
       },
       {
         method: "GET",
         path: "/profile/latest-updated",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.getProfileLatestStatusHandler
+        middlewares: [
+          this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] }),
+          this.deps.getProfileLatestStatusRequestValidator
+        ],
+        handler: this.deps.getProfileLatestStatusHandler,
+        cache: {
+          key: ProfileCacheKeys.getProfileLatestStatus,
+          ttlSeconds: 60 * 60
+        }
       },
       {
         method: "PUT",
         path: "/profile/info",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.upsertProfileInfoHandler
+        middlewares: [
+          this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] }),
+          this.deps.upsertProfileInfoRequestValidator
+        ],
+        handler: this.deps.upsertProfileInfoHandler,
+        cache: {
+          invalidate: [ProfileCacheKeys.allPattern]
+        }
       },
       {
         method: "GET",
         path: "/profile/info",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.getProfileInfoHandler
+        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] })],
+        handler: this.deps.getProfileInfoHandler,
+        cache: {
+          key: ProfileCacheKeys.getProfileInfo,
+          ttlSeconds: 60 * 60
+        }
       },
       {
         method: "PUT",
         path: "/profile/resume",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.upsertProfileResumeHandler
+        middlewares: [
+          this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] }),
+          this.deps.upsertProfileResumeRequestValidator
+        ],
+        handler: this.deps.upsertProfileResumeHandler,
+        cache: {
+          invalidate: [ProfileCacheKeys.allPattern]
+        }
       },
       {
         method: "GET",
         path: "/profile/resume",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.getProfileResumeHandler
+        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] })],
+        handler: this.deps.getProfileResumeHandler,
+        cache: {
+          key: ProfileCacheKeys.getProfileResume,
+          ttlSeconds: 60 * 60
+        }
       },
       {
         method: "PUT",
         path: "/profile/work",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.upsertProfileWorkHandler
+        middlewares: [
+          this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] }),
+          this.deps.upsertProfileWorkRequestValidator
+        ],
+        handler: this.deps.upsertProfileWorkHandler,
+        cache: {
+          invalidate: [ProfileCacheKeys.allPattern]
+        }
       },
       {
         method: "GET",
         path: "/profile/work",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.getProfileWorkHandler
+        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] })],
+        handler: this.deps.getProfileWorkHandler,
+        cache: {
+          key: ProfileCacheKeys.getProfileWork,
+          ttlSeconds: 60 * 60
+        }
       },
       {
         method: "PUT",
         path: "/profile/contact",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.upsertProfileContactHandler
+        middlewares: [
+          this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] }),
+          this.deps.upsertProfileContactRequestValidator
+        ],
+        handler: this.deps.upsertProfileContactHandler,
+        cache: {
+          invalidate: [ProfileCacheKeys.allPattern]
+        }
       },
       {
         method: "GET",
         path: "/profile/contact",
         version: 1,
-        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "apikey"] })],
-        handler: this.deps.getProfileContactHandler
+        middlewares: [this.deps.accessControlMiddleware.build({ methods: ["bearer", "api-key"] })],
+        handler: this.deps.getProfileContactHandler,
+        cache: {
+          key: ProfileCacheKeys.getProfileContact,
+          ttlSeconds: 60 * 60
+        }
       }
     ];
   }

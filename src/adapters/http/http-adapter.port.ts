@@ -1,5 +1,6 @@
-import { BaseError, ProblemDetail } from "../../core/errors/base.error";
+import { BaseError, type ProblemDetail } from "../../core/errors/base.error";
 import { InternalServerError } from "./errors/http.error";
+import { type Cache } from "../../core/ports/cache.port";
 
 export type HttpRequestInput = {
   body?: any;
@@ -41,17 +42,19 @@ export type HttpHandler<TContext extends HttpRequestInput = HttpRequestInput, TR
 };
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type HttpCache = {
+  ttlSeconds?: number;
+  key?: string | ((ctx: HttpContext) => string);
+  invalidate?: string[] | ((ctx: HttpContext) => string[]);
+};
+
 export type HttpRoute = {
   method: HttpMethod;
   path: string;
   version?: number;
   handler: HttpHandler;
   middlewares?: HttpMiddleware[];
-  // TODO: implemented cache route
-  // cache?: {
-  //   ttl?: number;
-  //   key?: string | ((ctx: HttpContext) => string);
-  // };
+  cache?: HttpCache;
 };
 
 export type HttpRouteDefinition = {
@@ -61,30 +64,51 @@ export type HttpRouteDefinition = {
 export type HttpReply = {
   success(response: { statusCode: number; data?: any }): Promise<void> | void;
   error(response: { statusCode: number; error: any }): Promise<void> | void;
+  setHeaders(headers: Record<string, number | string>): Promise<void> | void;
+};
+
+export type HttpRouteServices = {
+  cache: Cache;
 };
 
 async function runPipeline(
-  route: { middlewares?: HttpMiddleware[]; handler: HttpHandler },
-  ctx: HttpContext
-): Promise<HttpResponse> {
+  ctx: HttpContext,
+  route: HttpRoute,
+  services: HttpRouteServices
+): Promise<{ cacheHit: boolean; result: HttpResponse }> {
+  const { cache } = services;
+
   for (const middlware of route.middlewares ?? []) {
     await middlware.handle(ctx);
   }
-  return route.handler.handle(ctx);
+
+  if (route.method === "GET" && route?.cache?.key) {
+    const { key } = route.cache;
+    const cahceKey = typeof key === "function" ? key(ctx) : key;
+    const cached = await cache.get(cahceKey);
+    if (cached) {
+      return { cacheHit: true, result: cached };
+    }
+  }
+
+  return { cacheHit: false, result: await route.handler.handle(ctx) };
 }
 
 export async function executeHttpRoute(
   route: HttpRoute,
   request: HttpRequest,
-  reply: HttpReply
+  reply: HttpReply,
+  services: HttpRouteServices
 ): Promise<void> {
+  const { cache } = services;
+
   const ctx: HttpContext = {
     request,
     state: {}
   };
 
   try {
-    const result = await runPipeline({ handler: route.handler, middlewares: route.middlewares }, ctx);
+    const { cacheHit, result } = await runPipeline(ctx, route, services);
 
     const response: HttpResponse = {
       statusCode: result.statusCode
@@ -93,6 +117,27 @@ export async function executeHttpRoute(
     if (result?.data) {
       response.data = result.data;
     }
+
+    if (route.method === "GET" && route?.cache?.key && route?.cache?.ttlSeconds && !cacheHit) {
+      const { key, ttlSeconds } = route.cache;
+      const cacheKey = typeof key === "function" ? key(ctx) : key;
+      await cache.set(cacheKey, result, { ttlSeconds });
+    }
+
+    if (route.method !== "GET" && route?.cache?.invalidate) {
+      const keys =
+        typeof route.cache.invalidate === "function"
+          ? route.cache.invalidate(ctx)
+          : route.cache.invalidate;
+
+      for (const key of keys) {
+        await cache.delPattern(key);
+      }
+    }
+
+    reply.setHeaders({
+      "x-cache": cacheHit ? "HIT" : "MISS"
+    });
 
     return reply.success(response);
   } catch (error) {
