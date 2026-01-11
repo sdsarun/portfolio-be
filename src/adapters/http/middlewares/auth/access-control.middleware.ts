@@ -1,6 +1,6 @@
 import { type HttpContext, type HttpRequestInput, type HttpMiddleware } from "../../http-adapter.port";
 
-export type AccessMethod = "bearer" | "apikey";
+export type AccessMethod = "bearer" | "api-key";
 export type AccessControlOptions = {
   methods: AccessMethod[];
 };

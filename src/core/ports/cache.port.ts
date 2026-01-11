@@ -1,11 +1,12 @@
 export type CacheSetOptions = {
-  ttl?: number; // seconds
+  ttlSeconds?: number;
 };
 
 export type Cache = {
-  get<Result = any>(key: string): Promise<Result | null>;
-  set(key: string, value: string, options?: CacheSetOptions): Promise<void>;
+  get<TResult = any>(key: string): Promise<TResult | null>;
+  set<TValue = any>(key: string, value: TValue, options?: CacheSetOptions): Promise<void>;
   del(key: string): Promise<void>;
+  delPattern(key: string): Promise<void>;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
 };

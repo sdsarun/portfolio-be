@@ -1,6 +1,5 @@
-import { ValidationError } from "../../../../../../core/errors/validation.error";
 import { type HttpContext, type HttpHandler, type HttpResponse } from "../../../../http-adapter.port";
-import { type UpdatePasswordBodyDTO, updatePasswordBodyDTOSchema } from "./update-password.dto";
+import { type UpdatePasswordBodyDTO } from "./update-password.dto";
 import { type UpdatePasswordUseCasePort } from "../../../../../../core/usecases/update-password/update-password.usecase";
 import { type UpdatePasswordOutput } from "../../../../../../core/usecases/update-password/update-password.output";
 
@@ -15,11 +14,7 @@ export class UpdatePasswordHandler implements UpdatePasswordHandlerPort {
   async handle(
     ctx: HttpContext<{ body: UpdatePasswordBodyDTO }, Record<string, any>>
   ): Promise<HttpResponse<UpdatePasswordOutput>> {
-    const parsed = await updatePasswordBodyDTOSchema.safeParseAsync(ctx.request.body);
-    if (!parsed.success) {
-      throw new ValidationError({ issues: parsed.error.issues });
-    }
-    const result = await this.deps.updatePasswordUseCase.execute(parsed.data);
+    const result = await this.deps.updatePasswordUseCase.execute(ctx.request.body!);
     return { statusCode: 200, data: result };
   }
 }

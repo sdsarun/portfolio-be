@@ -1,6 +1,7 @@
 import { type FastifyInstance, type FastifyRequest } from "fastify";
 import {
   executeHttpRoute,
+  type HttpRouteServices,
   type HttpRequest,
   type HttpRouteDefinition
 } from "../../../adapters/http/http-adapter.port";
@@ -29,7 +30,8 @@ function toHttpRequest(request: FastifyRequest): HttpRequest {
 
 export function fastifyRegisterRoutes(
   server: FastifyInstance<any, any, any, any>,
-  routeDefinitions: HttpRouteDefinition[]
+  routeDefinitions: HttpRouteDefinition[],
+  services: HttpRouteServices
 ) {
   for (const routeDefinition of routeDefinitions) {
     const routes = routeDefinition.routes();
@@ -39,17 +41,25 @@ export function fastifyRegisterRoutes(
         method: route.method,
         url: resolvedUrl,
         handler: async (request, reply) => {
-          await executeHttpRoute(route, toHttpRequest(request), {
-            success: ({ statusCode, data }) => {
-              reply.status(statusCode);
-              if (typeof data !== "undefined") {
-                reply.send(data);
+          await executeHttpRoute(
+            route,
+            toHttpRequest(request),
+            {
+              success: ({ statusCode, data }) => {
+                reply.status(statusCode);
+                if (typeof data !== "undefined") {
+                  reply.send(data);
+                }
+              },
+              error: ({ statusCode, error }) => {
+                reply.header("content-type", "application/problem+json").status(statusCode).send(error);
+              },
+              setHeaders: (headers) => {
+                reply.headers(headers);
               }
             },
-            error: ({ statusCode, error }) => {
-              reply.header("content-type", "application/problem+json").status(statusCode).send(error);
-            }
-          });
+            services
+          );
         }
       });
       logger.info(`Mapped ${route.method} ${resolvedUrl}`);
