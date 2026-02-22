@@ -70,6 +70,17 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
     return record ? this.toEntity(record) : null;
   }
 
+  async findValidByHashedKey(hashedKey: string): Promise<ApiKey | null> {
+    const record = await this.prisma.apiKey.findFirst({
+      where: {
+        hashedKey,
+        deletedAt: null,
+        revokedAt: null
+      }
+    });
+    return record ? this.toEntity(record) : null;
+  }
+
   async revokeByIds(id: string[]): Promise<void> {
     await this.prisma.apiKey.updateMany({
       data: { revokedAt: new Date() },
