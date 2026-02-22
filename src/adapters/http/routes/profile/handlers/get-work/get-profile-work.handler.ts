@@ -11,7 +11,7 @@ export class GetProfileWorkHandler implements GetProfileWorkHandlerPort {
     const result = await this.deps.getProfileWorkUseCase.execute();
     return {
       statusCode: 200,
-      data: { workExperiences: result.workExperiences }
+      data: { projectExperiences: result.projectExperiences }
     };
   }
 }
