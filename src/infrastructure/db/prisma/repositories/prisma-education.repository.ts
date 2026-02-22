@@ -38,7 +38,7 @@ export class PrismaEducationRepository implements EducationRepository {
   async findByProfileId(profileId: string): Promise<Education[]> {
     const records = await this.prisma.education.findMany({
       where: { profileId, deletedAt: null },
-      orderBy: [{ updatedAt: "desc" }]
+      orderBy: [{ displayOrder: "asc" }]
     });
     return records.map(this.toEntity);
   }
@@ -46,7 +46,7 @@ export class PrismaEducationRepository implements EducationRepository {
   async findAll(): Promise<Education[]> {
     const records = await this.prisma.education.findMany({
       where: { deletedAt: null },
-      orderBy: [{ updatedAt: "desc" }]
+      orderBy: [{ displayOrder: "asc" }]
     });
     return records.map(this.toEntity);
   }
