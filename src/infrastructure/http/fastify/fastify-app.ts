@@ -10,6 +10,7 @@ import { randomUUID } from "crypto";
 
 export function createFastifyApp(): HttpAppliaction {
   const server = fastify({
+    bodyLimit: 10 * 1024 * 1024,
     loggerInstance: logger,
     genReqId: (req) => {
       const requestId = req.headers["x-request-id"];
