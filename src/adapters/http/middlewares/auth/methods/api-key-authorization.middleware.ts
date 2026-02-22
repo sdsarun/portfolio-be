@@ -28,8 +28,7 @@ export class ApiKeyAuthorizationMiddleware implements HttpMiddleware {
       }
 
       const hashedKey = await this.deps.sha256Hasher.hash(apiKey);
-      const payload = await this.deps.uow.apiKey.findByHashedKey(hashedKey);
-
+      const payload = await this.deps.uow.apiKey.findValidByHashedKey(hashedKey);
       if (!payload) {
         throw new UnauthorizedError();
       }
