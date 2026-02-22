@@ -17,6 +17,7 @@ export class GetApiKeysUseCase implements GetApiKeysUseCasePort {
     return {
       data: data.map((apiKey) => ({
         id: apiKey.fields.id!,
+        name: apiKey.fields.name ?? "",
         status: apiKey.fields.revokedAt ? "revoked" : "active",
         createdAt: apiKey.fields.createdAt!.toISOString(),
         keyRef: apiKey.fields.keyRef!

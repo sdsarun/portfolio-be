@@ -2,6 +2,7 @@ import { type PaginationMeta } from "../../shared/types/pagination.types";
 
 export type ApiKeyItem = {
   id: string;
+  name: string;
   keyRef: string;
   createdAt: string;
   status: "active" | "revoked";
