@@ -4,5 +4,6 @@ const PREFIX = "api-key";
 
 export const ApiKeyCacheKeys = {
   allPattern: `${PREFIX}:*`,
+  findValidByHashedKey: (hashed: string) => `${PREFIX}:${hashed}`,
   getApiKeys: (input: GetApiKeysInput) => `${PREFIX}:${input.offset}:${input.limit}`
 } as const;
