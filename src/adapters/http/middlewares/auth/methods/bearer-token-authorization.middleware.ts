@@ -1,13 +1,17 @@
 import { UnauthorizedError } from "../../../../../core/errors/auth.error";
 import { BaseError } from "../../../../../core/errors/base.error";
+import { type Logger } from "../../../../../core/ports/logger.port";
 import { type TokenCryptor } from "../../../../../core/ports/token-cryptor.port";
 import { type HttpMiddleware, type HttpContext } from "../../../http-adapter.port";
 
 export class BearerTokenAuthorizationMiddleware implements HttpMiddleware {
-  constructor(private readonly deps: { tokenCryptor: TokenCryptor }) {}
+  constructor(private readonly deps: { tokenCryptor: TokenCryptor; logger: Logger }) {}
 
   async handle(ctx: HttpContext): Promise<void> {
+    const { logger } = this.deps;
+
     if (ctx.state?.isAuthenticated) {
+      logger.info("Already authenticated, skipping bearer token check");
       return;
     }
 
@@ -15,10 +19,14 @@ export class BearerTokenAuthorizationMiddleware implements HttpMiddleware {
     try {
       const token = this.extractTokenFromHeader(request.headers);
       if (!token) {
+        logger.warn("No bearer token found in request headers");
         throw new UnauthorizedError();
       }
+
+      logger.info("Verifying bearer token");
       const payload = await this.deps.tokenCryptor.verify(token);
 
+      logger.info("Bearer token authenticated successfully");
       ctx.state = {
         authType: "bearer",
         isAuthenticated: true,
@@ -26,8 +34,10 @@ export class BearerTokenAuthorizationMiddleware implements HttpMiddleware {
       };
     } catch (error) {
       if (error instanceof BaseError) {
+        logger.warn("Bearer token authorization failed");
         throw error;
       }
+      logger.error({ error }, "Unexpected error during bearer token authorization");
       throw new UnauthorizedError();
     }
   }

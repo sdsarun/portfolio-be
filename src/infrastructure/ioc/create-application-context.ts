@@ -109,8 +109,16 @@ export function createApplicationContext(): ApplicationContext {
   });
 
   // middlewares
-  const bearerTokenAuthorizationMiddleware = new BearerTokenAuthorizationMiddleware({ tokenCryptor });
-  const apiKeyAuthorizationMiddleware = new ApiKeyAuthorizationMiddleware({ uow, sha256Hasher });
+  const bearerTokenAuthorizationMiddleware = new BearerTokenAuthorizationMiddleware({
+    tokenCryptor,
+    logger
+  });
+  const apiKeyAuthorizationMiddleware = new ApiKeyAuthorizationMiddleware({
+    uow,
+    sha256Hasher,
+    cache,
+    logger
+  });
   const accessControlMiddleware = new AccessControlMiddleware({
     accessMethods: {
       "api-key": apiKeyAuthorizationMiddleware,
